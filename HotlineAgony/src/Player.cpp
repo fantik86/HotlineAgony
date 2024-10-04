@@ -1,0 +1,203 @@
+#include "Player.h"
+#include "options.h"
+#include "raylib.h"
+#include "raymath.h"
+#include "Environment.h"
+#include <iostream>
+
+using game::living::Player;
+using game::global::Environment;
+
+extern Camera2D worldcam;
+
+void Player::Draw() {
+	Vector2 mouse2world = GetScreenToWorld2D(GetMousePosition(), player_camera);
+    
+    
+    character_direction = atan2f(mouse2world.y - position.y,
+        mouse2world.x - position.x); // Dont touch, i dont have idea how this hellish thing works!
+
+    float camera_distance = 35.f;
+    player_camera.target = position;
+
+    switch (state)
+    {
+    case CharacterState::Walking:
+        animator.Update(CharAnimationType::Walking, playerBodyTexture);
+        animator.Update(CharAnimationType::Legs, playerLegsTexture);
+        break;
+    case CharacterState::Attacking:
+        animator.Update(CharAnimationType::Punching, playerBodyTexture);
+        break;
+    default:
+        animator.Update(CharAnimationType::Idle, playerBodyTexture);
+        break;
+    }
+    float body_width = static_cast<float>(playerBodyTexture.width);
+    float body_height = static_cast<float>(playerBodyTexture.height);
+    float legs_width = static_cast<float>(playerLegsTexture.width);
+    float legs_height = static_cast<float>(playerLegsTexture.height);
+
+    float size_mul = 2.f; // Size multiplier
+    float walking_direction_to_rads = atan2(-walking_direction.y, walking_direction.x) * RAD2DEG;
+    if (walking_direction_to_rads < 0) {
+        walking_direction_to_rads += 360.0f;
+    }
+    BeginMode2D(player_camera);
+    DrawTexturePro(playerLegsTexture, Rectangle{0, 0, legs_width, legs_height},
+        Rectangle{ position.x, position.y, legs_width * size_mul, legs_height * size_mul }, 
+        Vector2{ legs_width * size_mul / 2.0f - 3, legs_height * size_mul / 2.0f }, 
+        walking_direction_to_rads, WHITE);
+    DrawTexturePro(playerBodyTexture, Rectangle{0, 0, body_width, body_height},
+        Rectangle{ position.x, position.y, body_width * size_mul, body_height * size_mul}, 
+        Vector2{body_width * size_mul / 2.0f - 3, body_height * size_mul / 2.0f}, 
+        character_direction * RAD2DEG, WHITE);
+    
+    EndMode2D();
+    bool isCameraPressed = IsKeyDown(std::get<KeyboardKey>(controls.camera));
+
+    Vector2 newCameraPos = Vector2{
+        GetScreenWidth() / 2.0f - camera_distance * cos(character_direction),
+        GetScreenHeight() / 2.0f - camera_distance * sin(character_direction) };
+
+    Camera2D temp_camera = player_camera;
+    temp_camera.zoom = 2; ///< Zoom defines length of camera flight during hold LShift
+    if (isCameraPressed) {
+        newCameraPos = Vector2Subtract(newCameraPos, Vector2Subtract(GetScreenToWorld2D(GetMousePosition(), temp_camera), position));
+    }
+    player_camera.offset = Vector2Lerp(player_camera.offset, newCameraPos, 0.3f);
+}
+
+void Player::updateKeyPress() {
+    // Fullscreen switching
+    if (IsKeyPressed(KEY_F11) || (IsKeyDown(KEY_LEFT_ALT) && IsKeyPressed(KEY_ENTER))) {
+        ToggleBorderlessWindowed();
+        // This is need to prevent camera easing to player from down-right corner upon game start
+        player_camera.offset = Vector2{ GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
+    }
+    if (IsKeyPressed(KEY_F2)) {
+        Environment::debug_draw_edges = !Environment::debug_draw_edges;
+    }
+    // Player movement
+    if (canControl) {
+        bool isLeftPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_left));
+        bool isRightPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_right));
+        bool isUpPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_up));
+        bool isDownPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_down));
+
+        float move_step = getWalkspeed() * GetFrameTime();
+
+        b2Vec2 velocity(0.f, 0.f);
+
+        if (isLeftPressed && !isRightPressed) {
+            player_camera.offset.x = Lerp(player_camera.offset.x, player_camera.offset.x - 50, 0.05f);
+            worldcam.rotation = Lerp(worldcam.rotation, 1, 0.05f);
+            velocity.x -= walkspeed;
+            setWalkingDirectionX(-1.0f);
+            moving = true;
+        }
+        if (isRightPressed && !isLeftPressed) {
+            player_camera.offset.x = Lerp(player_camera.offset.x, player_camera.offset.x + 50, 0.05f);
+            worldcam.rotation = Lerp(worldcam.rotation, -1, 0.05f);
+            velocity.x += walkspeed;
+            setWalkingDirectionX(1.0f);
+            moving = true;
+        }
+        if (isUpPressed && !isDownPressed) {
+            player_camera.offset.y = Lerp(player_camera.offset.y, player_camera.offset.y + 50, 0.05f);
+            velocity.y -= walkspeed;
+            setWalkingDirectionY(1.0f);
+            moving = true;
+        }
+        if (isDownPressed && !isUpPressed) {
+            player_camera.offset.y = Lerp(player_camera.offset.y, player_camera.offset.y - 50, 0.05f);
+            velocity.y += walkspeed;
+            setWalkingDirectionY(-1.0f);
+            moving = true;
+        }
+
+        if (!isLeftPressed && !isRightPressed && !isUpPressed && !isDownPressed) {
+            worldcam.rotation = Lerp(worldcam.rotation, 0, 0.05f);
+            moving = false;
+        }
+
+        if (!isUpPressed && !isDownPressed && (isRightPressed || isLeftPressed)) {
+            setWalkingDirectionY(0.0f);
+        }
+
+        if (isUpPressed && isDownPressed) {
+            setWalkingDirectionY(0.0f);
+        }
+
+        if (!isLeftPressed && !isRightPressed && (isUpPressed || isDownPressed)) {
+            worldcam.rotation = Lerp(worldcam.rotation, 0, 0.05f);
+            setWalkingDirectionX(0.0f);
+        }
+
+        if (isLeftPressed && isRightPressed) {
+            setWalkingDirectionX(0.0f);
+        }
+        physics_body->SetLinearVelocity(velocity);
+    }
+}
+
+void Player::updateState() {
+    bool isLeftPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_left));
+    bool isRightPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_right));
+    bool isUpPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_up));
+    bool isDownPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_down));
+    bool isAttackPressed = IsMouseButtonDown(std::get<MouseButton>(controls.attack));
+
+
+    if (isAttackPressed) {
+        state = CharacterState::Attacking;
+    }
+
+    if (animator.getCurrentAnimationType() == CharAnimationType::Punching &&
+        animator.getAnimationByType(CharAnimationType::Punching).getAnimationState() == AnimationState::Ended) {
+        if (moving) {
+            state = CharacterState::Walking;
+        }
+        else {
+            state = CharacterState::Idle;
+        }
+    }
+
+    if (state != CharacterState::Attacking) {
+        animator.getAnimationByType(CharAnimationType::Punching).setAnimationState(AnimationState::Playable);
+        if (isLeftPressed && isRightPressed) {
+            if (isUpPressed || isDownPressed) {
+                setState(CharacterState::Walking);
+            }
+            else {
+                setState(CharacterState::Idle);
+            }
+        }
+        else if (isUpPressed && isDownPressed) {
+            if (isLeftPressed || isRightPressed) {
+                setState(CharacterState::Walking);
+            }
+            else {
+                setState(CharacterState::Idle);
+            }
+        }
+        else if (isLeftPressed || isRightPressed || isUpPressed || isDownPressed) {
+            setState(CharacterState::Walking);
+        }
+        else {
+            setState(CharacterState::Idle);
+        }
+    }
+}
+
+void Player::updatePlayer() {
+    position.x = physics_body->GetPosition().x;
+    position.y = physics_body->GetPosition().y;
+    updateState();
+    updateKeyPress();
+    Draw();
+}
+
+void Player::setCamera(Camera2D& camera) {
+	player_camera = camera;
+}
