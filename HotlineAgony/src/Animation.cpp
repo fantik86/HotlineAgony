@@ -1,30 +1,31 @@
 #include "Animation.h"
+#include "Environment.h"
+#include "Animator.h"
 
 using game::drawing::Animation;
 
-Animation::Animation() : m_animationSequence(std::vector<Texture2D>({ 0 })), m_frameDelay(1) {}
-Animation::Animation(animation_sequence_t animationSequence, double animSpeed, bool isLooped) : m_animationSequence(animationSequence), m_frameDelay(animSpeed), m_looped(isLooped) {}
-
-animation_sequence_t Animation::getAnimationSequence() const {
-	return m_animationSequence;
+Animation::Animation(animation_sequence_t frame_sequence, Texture2D& texture, double frame_delay) :
+	m_frame_sequence(frame_sequence), m_current_texture(texture), 
+	m_frame_delay(frame_delay), m_next_frame_time(GetTime() + frame_delay), m_current_frame(0) {
+	
 }
 
-void Animation::setDelay(float newSpeed) {
-	m_frameDelay = newSpeed;
-}
 
-double Animation::getDelay() const {
-	return m_frameDelay;
-}
-
-void Animation::setAnimationState(AnimationState state) {
-	m_animation_state = state;
-}
-
-AnimationState Animation::getAnimationState() const {
-	return m_animation_state;
-}
-
-bool Animation::isAnimationLooped() const {
-	return m_looped;
+/// Updates texture of the Animation.
+AnimationState Animation::UpdateFrame() {
+	if (GetTime() >= m_next_frame_time) {
+		if (m_current_frame == m_frame_sequence.size()) { // if current frame is the last frame
+			if (m_looped) {
+				m_current_frame = 0;
+			}
+			else {
+				m_current_texture = m_frame_sequence.at(m_current_frame);
+				return AnimationState::Ended;	// Animation is ended
+			}
+		}
+		m_current_texture = m_frame_sequence.at(m_current_frame);
+		m_current_frame++;
+		m_next_frame_time = GetTime() + m_frame_delay;
+		return AnimationState::Playing;
+	}
 }

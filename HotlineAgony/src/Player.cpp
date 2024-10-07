@@ -4,6 +4,7 @@
 #include "raymath.h"
 #include "Environment.h"
 #include <iostream>
+#include "TaskScheduler.h"
 
 using game::living::Player;
 using game::global::Environment;
@@ -17,67 +18,58 @@ void Player::Draw() {
     character_direction = atan2f(mouse2world.y - position.y,
         mouse2world.x - position.x); // Dont touch, i dont have idea how this hellish thing works!
 
-    float camera_distance = 35.f;
     player_camera.target = position;
-
-    switch (state)
-    {
-    case CharacterState::Walking:
-        animator.Update(CharAnimationType::Walking, playerBodyTexture);
-        animator.Update(CharAnimationType::Legs, playerLegsTexture);
-        break;
-    case CharacterState::Attacking:
-        animator.Update(CharAnimationType::Punching, playerBodyTexture);
-        break;
-    default:
-        animator.Update(CharAnimationType::Idle, playerBodyTexture);
-        break;
-    }
+    
     float body_width = static_cast<float>(playerBodyTexture.width);
     float body_height = static_cast<float>(playerBodyTexture.height);
     float legs_width = static_cast<float>(playerLegsTexture.width);
     float legs_height = static_cast<float>(playerLegsTexture.height);
-
-    float size_mul = 2.f; // Size multiplier
-    float walking_direction_to_rads = atan2(-walking_direction.y, walking_direction.x) * RAD2DEG;
-    if (walking_direction_to_rads < 0) {
-        walking_direction_to_rads += 360.0f;
-    }
-    BeginMode2D(player_camera);
-    DrawTexturePro(playerLegsTexture, Rectangle{0, 0, legs_width, legs_height},
-        Rectangle{ position.x, position.y, legs_width * size_mul, legs_height * size_mul }, 
-        Vector2{ legs_width * size_mul / 2.0f - 3, legs_height * size_mul / 2.0f }, 
-        walking_direction_to_rads, WHITE);
-    DrawTexturePro(playerBodyTexture, Rectangle{0, 0, body_width, body_height},
-        Rectangle{ position.x, position.y, body_width * size_mul, body_height * size_mul}, 
-        Vector2{body_width * size_mul / 2.0f - 3, body_height * size_mul / 2.0f}, 
-        character_direction * RAD2DEG, WHITE);
     
+
+    float walking_direction_to_rads = atan2(-walking_direction.y, walking_direction.x) * RAD2DEG;
+
+    BeginMode2D(player_camera);
+
+    Environment::DrawTexture(playerLegsTexture, position, Vector2{ 0.5f, 0.5f }, legs_width, legs_height, character_size, walking_direction_to_rads);
+    Environment::DrawTexture(playerBodyTexture, position, Vector2{ 0.5f, 0.5f }, body_width, body_height, character_size, character_direction * RAD2DEG);
+
     EndMode2D();
     bool isCameraPressed = IsKeyDown(std::get<KeyboardKey>(controls.camera));
 
     Vector2 newCameraPos = Vector2{
-        GetScreenWidth() / 2.0f - camera_distance * cos(character_direction),
-        GetScreenHeight() / 2.0f - camera_distance * sin(character_direction) };
+        GetScreenWidth() / 2.0f - camera_info.camera_player_distance * cos(character_direction),
+        GetScreenHeight() / 2.0f - camera_info.camera_player_distance * sin(character_direction) };
 
     Camera2D temp_camera = player_camera;
-    temp_camera.zoom = 2; ///< Zoom defines length of camera flight during hold LShift
+    temp_camera.zoom = camera_info.fly_length; ///< Zoom defines length of camera flight during hold LShift
+
     if (isCameraPressed) {
+        temp_camera.zoom = 1.f / temp_camera.zoom;
         newCameraPos = Vector2Subtract(newCameraPos, Vector2Subtract(GetScreenToWorld2D(GetMousePosition(), temp_camera), position));
     }
-    player_camera.offset = Vector2Lerp(player_camera.offset, newCameraPos, 0.3f);
+    player_camera.offset = Vector2Lerp(player_camera.offset, newCameraPos, camera_info.speed);
 }
 
 void Player::updateKeyPress() {
     // Fullscreen switching
     if (IsKeyPressed(KEY_F11) || (IsKeyDown(KEY_LEFT_ALT) && IsKeyPressed(KEY_ENTER))) {
-        ToggleBorderlessWindowed();
-        // This is need to prevent camera easing to player from down-right corner upon game start
+        int currentMonitor = GetCurrentMonitor();
+        if (IsWindowFullscreen()) {
+            SetWindowSize(800, 600);
+        }
+        else {
+            SetWindowSize(GetMonitorWidth(currentMonitor), GetMonitorHeight(currentMonitor));
+        }
+        ToggleFullscreen();
+        
+        // This is need to prevent camera easing to player from down-right corner upon changing fullscreen
         player_camera.offset = Vector2{ GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
     }
     if (IsKeyPressed(KEY_F2)) {
         Environment::debug_draw_edges = !Environment::debug_draw_edges;
     }
+
+
     // Player movement
     if (canControl) {
         bool isLeftPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_left));
@@ -150,21 +142,11 @@ void Player::updateState() {
 
 
     if (isAttackPressed) {
-        state = CharacterState::Attacking;
+        setState(CharacterState::Attacking);
     }
 
-    if (animator.getCurrentAnimationType() == CharAnimationType::Punching &&
-        animator.getAnimationByType(CharAnimationType::Punching).getAnimationState() == AnimationState::Ended) {
-        if (moving) {
-            state = CharacterState::Walking;
-        }
-        else {
-            state = CharacterState::Idle;
-        }
-    }
 
     if (state != CharacterState::Attacking) {
-        animator.getAnimationByType(CharAnimationType::Punching).setAnimationState(AnimationState::Playable);
         if (isLeftPressed && isRightPressed) {
             if (isUpPressed || isDownPressed) {
                 setState(CharacterState::Walking);

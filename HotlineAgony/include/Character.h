@@ -5,8 +5,6 @@
 #include "Animator.h"
 #include "box2d/box2d.h"
 
-using game::drawing::Animator;
-
 namespace game {
     namespace living {
         /**
@@ -40,6 +38,7 @@ namespace game {
             void setWalkingDirectionY(float new_Y);
             float character_direction = 0; ///< Character direction **(in radians!)**
             Vector2 walking_direction = { 0, 0 };
+            float character_size = 0.95f; 
             int walkspeed = 300; ///< Character speed.
             float m_health; ///< Character health. Game will define Character as dead, if health <= 0.
             const float m_max_health; ///< Max health of the character.
@@ -48,7 +47,6 @@ namespace game {
             bool isInvincible = false; ///< Is Character can be killed
             CharacterState state = CharacterState::Idle; ///< Character state
             CharacterAppearance appearance = CharacterAppearance::russian_mafia; ///< Character \ref Animation set
-            Animator animator; ///< \ref Animator object of the Character.
         };
     }
 }

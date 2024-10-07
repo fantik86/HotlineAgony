@@ -2,14 +2,15 @@
 #include "raylib.h"
 #include "options.h"
 #include "Animation.h"
+#include "TaskScheduler.h"
+
 
 using game::living::Character;
 
+
 Character::Character() : m_health(100), m_max_health(100) {}
 
-Character::Character(float health) : m_health(health), m_max_health(health) {
-	animator.LoadAnimations(appearance);
-}
+Character::Character(float health) : m_health(health), m_max_health(health) {}
 
 /**
 * @brief Returns \ref Character "Character's" health
@@ -62,9 +63,11 @@ CharacterState Character::getState() const {
 }
 
 void Character::setState(CharacterState new_state) {
-	if (state != new_state) {
-		state = new_state;
+	if (state == new_state) {
+		return;
 	}
+	
+	state = new_state;
 }
 
 int Character::getWalkspeed() const {

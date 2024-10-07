@@ -9,7 +9,7 @@
 
 #define SHOW_HITBOX 0
 
-#define FULLSCREEN_ON_START true
+#define FULLSCREEN_ON_START false
 
 #define WINDOW_NAME "HOTLINE AGONY | version " GAME_VERSION
 #define DEFAULT_WINDOW_WIDTH 800.0f

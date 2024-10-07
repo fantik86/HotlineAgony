@@ -3,31 +3,35 @@
 #include "raylib.h"
 #include "utils.h"
 
-/**
-* \file Animation.h
-* @brief Animation class definitions.
-* @details This file contains Animation class.
-*/
-
 namespace game {
     namespace drawing {
         class Animation {
         public:
-            Animation();
-            Animation(animation_sequence_t animationSequence, double animSpeed, bool isLooped);
-            animation_sequence_t getAnimationSequence() const;
-            void setDelay(float newSpeed);
-            bool isAnimationLooped() const;
-            double getDelay() const;
-            int frame_counter = 0; ///< Counter that defines current animation frame.
-            double next_frame_time = 0; ///< Point in time, when game reaching this point in time, \ref Animator::sequence_counter increments.
-            void setAnimationState(AnimationState state);
-            AnimationState getAnimationState() const;
+            Animation(animation_sequence_t frame_sequence, Texture2D& texture, double frame_delay);
+            AnimationState UpdateFrame();
+            bool operator==(const Animation& b) {
+                if (m_current_frame == b.m_current_frame && m_frame_sequence.size() == b.m_frame_sequence.size()
+                    && m_current_texture.id == b.m_current_texture.id && m_next_frame_time == b.m_next_frame_time
+                    && m_frame_delay == b.m_frame_delay && m_looped == b.m_looped) {
+                    return true;
+                }
+                return false;
+            }
+            void operator=(const Animation& b) {
+                m_current_frame = b.m_current_frame;
+                m_current_texture = b.m_current_texture;
+                m_frame_sequence = b.m_frame_sequence;
+                m_next_frame_time = b.m_next_frame_time;
+                m_frame_delay = b.m_frame_delay;
+                m_looped = b.m_looped;
+            }
         private:
-            animation_sequence_t m_animationSequence;
-            double m_frameDelay;
+            int m_current_frame;
+            animation_sequence_t m_frame_sequence;
+            Texture2D& m_current_texture;
+            double m_next_frame_time;
+            double m_frame_delay;
             bool m_looped = true;
-            AnimationState m_animation_state = AnimationState::Playable; ///< Current \ref ANIMATION_STATE
         };
     }
 }

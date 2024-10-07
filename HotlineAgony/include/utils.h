@@ -37,7 +37,7 @@ enum class TileRotation { // TODO: make this enum float
 */
 enum TILEMAP_LAYER {
     TILEMAP_LAYER_FLOOR,
-    TILEMAP_LAYER_COLLISION,
+    TILEMAP_LAYER_WALL,
     TILEMAP_LAYER_ROOF
 };
 

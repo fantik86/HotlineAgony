@@ -2,6 +2,13 @@
 project("HotlineAgony")
 set(CMAKE_CXX_STANDARD 17)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+set(CMAKE_PDB_OUTPUT_DIRECTORY     "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
+
 if (POLICY CMP0141)
   cmake_policy(SET CMP0141 NEW)
   set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
@@ -40,12 +47,26 @@ set(B2DRAWRAYLIB_SOURCES
     ${B2DRAWRAYLIB_INCLUDE_DIR}/b2DrawRayLib.cpp
 )
 
-# Adding our source files
+
 file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/HotlineAgony/src/*.cpp") # Define PROJECT_SOURCES as a list of all source files
 set(PROJECT_INCLUDE "${CMAKE_CURRENT_LIST_DIR}/HotlineAgony/include/") # Define PROJECT_INCLUDE to be the path to the include directory of the project
 
-# Declaring our executable
+
 add_executable(${PROJECT_NAME})
+
+add_custom_target(copy_data
+	COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different 
+        "${CMAKE_CURRENT_LIST_DIR}/HotlineAgony/assets/"
+        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/"
+)
+add_dependencies(${PROJECT_NAME} copy_data)
+
+if (MSVC AND WIN32 AND NOT MSVC_VERSION VERSION_LESS 142)
+    target_link_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)
+    target_compile_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:/ZI>)
+
+endif()
+
 target_sources(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCES} ${B2DRAWRAYLIB_SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_INCLUDE} ${B2DRAWRAYLIB_INCLUDE_DIR})
 target_link_libraries(${PROJECT_NAME} PRIVATE box2d raylib)
