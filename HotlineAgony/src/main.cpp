@@ -25,8 +25,6 @@ Camera2D worldcam;
 int main(int argc, char** argv)
 {
 
-    SetTraceLogLevel(8);
-    SetTraceLogCallback(testfunc);
 
     InitWindow((int)DEFAULT_WINDOW_WIDTH, (int)DEFAULT_WINDOW_HEIGHT, WINDOW_NAME);
     
@@ -120,7 +118,7 @@ int main(int argc, char** argv)
 
         BeginMode2D(worldcam);
         
-        Environment::DrawTilemap();
+        Environment::DrawTilemap(plr.player_camera, plr.position);
 
         EndMode2D();
 

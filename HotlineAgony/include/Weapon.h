@@ -1,15 +1,37 @@
 #pragma once
 #include "raylib.h"
 
-class MeleeWeapon {
+class BaseWeapon
+{
 public:
-	virtual void Attack() = 0;
-	virtual ~MeleeWeapon() = default;
+	BaseWeapon() = 0;
+	virtual ~BaseWeapon() = default;
+	virtual void Drop() = 0;
+	virtual void Throw() = 0;
 protected:
-	float attackCooldown;
+	bool canDrop;
 };
 
-class Knife : public MeleeWeapon {
+
+class MeleeWeapon : BaseWeapon {
 public:
-	Knife() : attackCooldown(1.5f) {}
+	MeleeWeapon() = 0;
+	virtual ~MeleeWeapon() = default;
+
+	virtual void Attack() = 0;
+protected:
+	float attackCooldown;
+	bool canAttack;
+};
+
+class RangeWeapon : BaseWeapon {
+public:
+	RangeWeapon() = 0;
+	virtual ~RangeWeapon() = default;
+
+	virtual void Shoot() = 0;
+	virtual void Reload() = 0;
+protected:
+	float shootCooldown;
+	bool canShoot;
 };

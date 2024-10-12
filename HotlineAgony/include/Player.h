@@ -22,8 +22,12 @@ namespace game {
             using Character::Character;
             Player(Camera2D& camera) : player_camera(camera) {
 
-                game::drawing::Animation anim_idle(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/walking"), playerBodyTexture, 0.3);
-                Animator::Add(anim_idle);
+                game::drawing::Animation anim_idle(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/idle"), playerBodyTexture, 0.01);
+                game::drawing::Animation anim_moving(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/walking"), playerBodyTexture, 0.1);
+                game::drawing::Animation anim_legs(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/legs"), playerLegsTexture, 0.05);
+                Animator::Add(anim_idle, [this]() -> bool {return getState() == CharacterState::Idle;});
+                Animator::Add(anim_moving, [this]() -> bool {return getState() == CharacterState::Walking;});
+                Animator::Add(anim_legs, [this]() -> bool {return getState() == CharacterState::Walking;});
 
                 b2BodyDef bodyPlayerDef;
                 bodyPlayerDef.type = b2_dynamicBody;

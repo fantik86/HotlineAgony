@@ -1,6 +1,7 @@
 #include "Environment.h"
 #include "TexturePool.h"
 #include "box2d/box2d.h"
+#include <raymath.h>
 
 using game::global::Environment;
 using game::global::TexturePool;
@@ -25,13 +26,32 @@ void Environment::FillTilemap(TileType building, TILEMAP_LAYER layer) {
 	}
 }
 
-void Environment::DrawTilemap() {
+void Environment::DrawTilemap(const Camera2D& camera, const Vector2& position) {
 	Tilemap& tilemap = *m_tilemap;
 	TilemapBuffer_t& buffer = *tilemap.getBuffer();
-	for (size_t height = 0; height < buffer.size(); height++) {
-		for (size_t column = 0; column < buffer.at(height).size(); column++) {
-			for (size_t row = 0; row < buffer.at(height).at(column).size(); row++) {
+	for (size_t height = 0; height < buffer.size(); ++height) {
+		for (size_t column = 0; column < buffer.at(height).size(); ++column) {
+			for (size_t row = 0; row < buffer.at(height).at(column).size(); ++row) {
 				const Tile& tile = buffer.at(height).at(column).at(row);
+
+				/* Unfinished system for drawing only tiles that camera can see - DO NOT DELETE!!!
+
+				const Texture& tile_texture = TexturePool::GetTexture(TexturePoolTextureType::Building, static_cast<int>(TileType::WALL));
+				
+				Vector2 newPos = Vector2Add(Vector2Divide(position, camera.offset), Vector2Add(Vector2Multiply(position, Vector2{camera.zoom, camera.zoom}), Vector2{(float)column * tile_texture.width / 2, (float)row * tile_texture.height / 2}));
+				float camera_left = newPos.x - 100 / 2;
+				float camera_right = newPos.x + 100 / 2;
+				float camera_up = newPos.y - 100 / 2;
+				float camera_bottom = newPos.y + 100 / 2;
+				
+
+				if (column * tile_texture.width >= camera_left &&
+					column * tile_texture.width <= camera_right &&
+					row * tile_texture.height >= camera_up &&
+					row * tile_texture.height <= camera_bottom) {
+					continue;
+				}
+				*/
 
 				if (tile.texture == TileType::AIR) {
 					continue;

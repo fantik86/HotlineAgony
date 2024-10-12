@@ -36,7 +36,6 @@ namespace game {
             void setWalkingDirection(Vector2 new_walking_direction);
             void setWalkingDirectionX(float new_X);
             void setWalkingDirectionY(float new_Y);
-            float character_direction = 0; ///< Character direction **(in radians!)**
             Vector2 walking_direction = { 0, 0 };
             float character_size = 0.95f; 
             int walkspeed = 300; ///< Character speed.

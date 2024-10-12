@@ -15,7 +15,7 @@ void Player::Draw() {
 	Vector2 mouse2world = GetScreenToWorld2D(GetMousePosition(), player_camera);
     
     
-    character_direction = atan2f(mouse2world.y - position.y,
+    float character_direction = atan2f(mouse2world.y - position.y,
         mouse2world.x - position.x); // Dont touch, i dont have idea how this hellish thing works!
 
     player_camera.target = position;
@@ -26,11 +26,11 @@ void Player::Draw() {
     float legs_height = static_cast<float>(playerLegsTexture.height);
     
 
-    float walking_direction_to_rads = atan2(-walking_direction.y, walking_direction.x) * RAD2DEG;
+    float legs_direction = atan2(-walking_direction.y, walking_direction.x) * RAD2DEG;
 
     BeginMode2D(player_camera);
 
-    Environment::DrawTexture(playerLegsTexture, position, Vector2{ 0.5f, 0.5f }, legs_width, legs_height, character_size, walking_direction_to_rads);
+    Environment::DrawTexture(playerLegsTexture, position, Vector2{ 0.5f, 0.5f }, legs_width, legs_height, character_size, legs_direction);
     Environment::DrawTexture(playerBodyTexture, position, Vector2{ 0.5f, 0.5f }, body_width, body_height, character_size, character_direction * RAD2DEG);
 
     EndMode2D();
@@ -47,6 +47,7 @@ void Player::Draw() {
         temp_camera.zoom = 1.f / temp_camera.zoom;
         newCameraPos = Vector2Subtract(newCameraPos, Vector2Subtract(GetScreenToWorld2D(GetMousePosition(), temp_camera), position));
     }
+    player_camera.target = position;
     player_camera.offset = Vector2Lerp(player_camera.offset, newCameraPos, camera_info.speed);
 }
 
