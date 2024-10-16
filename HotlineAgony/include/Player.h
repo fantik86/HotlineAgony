@@ -6,6 +6,7 @@
 #include "Animator.h"
 
 using game::living::Character;
+using game::drawing::Animation;
 extern b2World world;
 
 class CameraInfo {
@@ -15,6 +16,7 @@ public:
     float fly_length = 0.55f;
 };
 
+
 namespace game {
     namespace living {
         class Player : public Character {
@@ -22,12 +24,41 @@ namespace game {
             using Character::Character;
             Player(Camera2D& camera) : player_camera(camera) {
 
-                game::drawing::Animation anim_idle(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/idle"), playerBodyTexture, 0.01);
-                game::drawing::Animation anim_moving(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/walking"), playerBodyTexture, 0.1);
-                game::drawing::Animation anim_legs(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/legs"), playerLegsTexture, 0.05);
-                Animator::Add(anim_idle, [this]() -> bool {return getState() == CharacterState::Idle;});
-                Animator::Add(anim_moving, [this]() -> bool {return getState() == CharacterState::Walking;});
-                Animator::Add(anim_legs, [this]() -> bool {return getState() == CharacterState::Walking;});
+                Animation anim_idle(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/idle"), playerBodyTexture, true, 0.01);
+                Animation anim_moving(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/walking"), playerBodyTexture, true, 0.1);
+                Animation anim_legs(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/legs"), playerLegsTexture, true, 0.05);
+                Animation anim_punching(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/punching"), playerBodyTexture, false, 0.04);
+                Animation anim_knife(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/knife"), playerBodyTexture, false, 0.04);
+
+
+                Animator::Add(0, anim_idle, [this]() -> bool {return getState() == CharacterState::Idle;});
+                Animator::Add(1, anim_moving, [this]() -> bool {return getState() == CharacterState::Walking;});
+                Animator::Add(2, anim_legs, [this]() -> bool {return getState() == CharacterState::Walking;});
+                /*Animator::Add(3, anim_punching, [this]() -> bool {
+                    if (Animator::GetAnimationById(3).getAnimationState() == AnimationState::Ended) {
+                        setState(CharacterState::Idle);
+                        Animator::GetAnimationById(3).setAnimationState(AnimationState::Playing);
+                    }
+                    if (getState() == CharacterState::Attacking) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                });*/
+                Animator::Add(4, anim_knife, [this]() -> bool {
+                    if (Animator::GetAnimationById(4).getAnimationState() == AnimationState::Ended) {
+                        setState(CharacterState::Idle);
+                        Animator::GetAnimationById(4).setAnimationState(AnimationState::Playing);
+                    }
+                    if (getState() == CharacterState::Attacking) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                });
+
 
                 b2BodyDef bodyPlayerDef;
                 bodyPlayerDef.type = b2_dynamicBody;

@@ -1,9 +1,9 @@
 #pragma once
 #include "utils.h"
 #include "Tilemap.h"
-#include <array>
 #include <memory>
 #include "box2d/box2d.h"
+#include "Weapon.h"
 
 using game::drawing::Tilemap;
 
@@ -32,6 +32,7 @@ namespace game {
 			static Tilemap* m_tilemap;
 			static float tilemap_size_multiplier;
 			static std::unique_ptr<b2World> m_gamePhysicsWorld;
+			static std::vector<MeleeWeapon*> m_Weapons;
 			float dayTime = 0.0f; ///< Current day time. 0 for the 0:00 and 1 for the 23:59
 		};
 	}

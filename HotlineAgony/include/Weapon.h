@@ -1,37 +1,33 @@
 #pragma once
-#include "raylib.h"
+#include <raylib.h>
 
-class BaseWeapon
-{
+
+class MeleeWeapon {
 public:
-	BaseWeapon() = 0;
-	virtual ~BaseWeapon() = default;
-	virtual void Drop() = 0;
-	virtual void Throw() = 0;
-protected:
-	bool canDrop;
-};
-
-
-class MeleeWeapon : BaseWeapon {
-public:
-	MeleeWeapon() = 0;
+	MeleeWeapon(Vector2 position, Texture2D& lyingSprite) : m_position(position), m_lyingSprite(lyingSprite) {}
 	virtual ~MeleeWeapon() = default;
 
 	virtual void Attack() = 0;
+	virtual void Drop() = 0;
+	virtual void Throw() = 0;
 protected:
-	float attackCooldown;
-	bool canAttack;
+	Vector2 m_position;
+	bool m_onGround;
+	bool m_canDrop;
+	Texture2D& m_lyingSprite;
+
+	float m_attackCooldown;
+	bool m_canAttack;
 };
 
-class RangeWeapon : BaseWeapon {
+class wp_Knife : MeleeWeapon {
 public:
-	RangeWeapon() = 0;
-	virtual ~RangeWeapon() = default;
-
-	virtual void Shoot() = 0;
-	virtual void Reload() = 0;
+	wp_Knife(Vector2 position, Texture2D& lyingSprite) : MeleeWeapon(position, lyingSprite) {
+		m_onGround = true;
+		m_canDrop = true;
+		m_attackCooldown = 1.f;
+		m_canAttack = true;
+	}
+	void Attack() override;
 protected:
-	float shootCooldown;
-	bool canShoot;
 };

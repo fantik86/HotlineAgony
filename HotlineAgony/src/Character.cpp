@@ -2,7 +2,6 @@
 #include "raylib.h"
 #include "options.h"
 #include "Animation.h"
-#include "TaskScheduler.h"
 
 
 using game::living::Character;

@@ -4,7 +4,6 @@
 #include "raymath.h"
 #include "Environment.h"
 #include <iostream>
-#include "TaskScheduler.h"
 
 using game::living::Player;
 using game::global::Environment;
@@ -30,8 +29,8 @@ void Player::Draw() {
 
     BeginMode2D(player_camera);
 
-    Environment::DrawTexture(playerLegsTexture, position, Vector2{ 0.5f, 0.5f }, legs_width, legs_height, character_size, legs_direction);
-    Environment::DrawTexture(playerBodyTexture, position, Vector2{ 0.5f, 0.5f }, body_width, body_height, character_size, character_direction * RAD2DEG);
+    Environment::DrawTexture(playerLegsTexture, position, Vector2{ 16, 16 }, legs_width, legs_height, character_size, legs_direction);
+    Environment::DrawTexture(playerBodyTexture, position, Vector2{ 16, 16 }, body_width, body_height, character_size, character_direction * RAD2DEG);
 
     EndMode2D();
     bool isCameraPressed = IsKeyDown(std::get<KeyboardKey>(controls.camera));
@@ -145,6 +144,8 @@ void Player::updateState() {
     if (isAttackPressed) {
         setState(CharacterState::Attacking);
     }
+
+
 
 
     if (state != CharacterState::Attacking) {

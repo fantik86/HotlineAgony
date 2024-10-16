@@ -11,6 +11,7 @@ Tilemap* Environment::m_tilemap = nullptr;
 bool Environment::debug_draw_edges = false;
 float Environment::tilemap_size_multiplier = 0.5f;
 std::unique_ptr<b2World> Environment::m_gamePhysicsWorld = std::make_unique<b2World>(b2Vec2_zero);
+std::vector<MeleeWeapon*> Environment::m_Weapons = {};
 
 void Environment::SetTilemap(Tilemap& tilemap) {
 	m_tilemap = &tilemap;
@@ -171,10 +172,14 @@ void Environment::FillTilemapSquare(int begin_x, int begin_y, int end_x, int end
 }
 
 void Environment::DrawTexture(Texture2D texture, Vector2 position, Vector2 origin, float width, float height, float size, float rotation) {
-	
+	/*
 	DrawTexturePro(texture, Rectangle{ 0, 0, width, height },
 		Rectangle{ position.x, position.y, width * size, height * size },
 		Vector2{ width * size / (1 / origin.x), height * size / (1 / origin.y) },
+		rotation, WHITE);*/
+	DrawTexturePro(texture, Rectangle{ 0, 0, width, height },
+		Rectangle{ position.x, position.y, width * size, height * size },
+		Vector2{ origin.x, origin.y },
 		rotation, WHITE);
 }
 
