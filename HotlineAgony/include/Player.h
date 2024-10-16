@@ -28,7 +28,7 @@ namespace game {
                 Animation anim_moving(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/walking"), playerBodyTexture, true, 0.1);
                 Animation anim_legs(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/legs"), playerLegsTexture, true, 0.05);
                 Animation anim_punching(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/punching"), playerBodyTexture, false, 0.04);
-                Animation anim_knife(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/knife"), playerBodyTexture, false, 0.04);
+                Animation anim_knife(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/knife"), playerBodyTexture, false, 0.08);
 
 
                 Animator::Add(0, anim_idle, [this]() -> bool {return getState() == CharacterState::Idle;});
