@@ -87,7 +87,7 @@ namespace game {
                 physics_body->CreateFixture(&fixture);
             }
 
-            void Draw(); // TODO: move "Draw()" to Character class and make it virtual
+            void Draw() override;
             void updateKeyPress(); // TODO: move "Move()" to Character class and make it virtual
             void updateState();
             void updatePlayer();

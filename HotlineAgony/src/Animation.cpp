@@ -1,6 +1,4 @@
 #include "Animation.h"
-#include "Environment.h"
-#include "Animator.h"
 
 using game::drawing::Animation;
 

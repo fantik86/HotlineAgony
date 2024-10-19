@@ -44,9 +44,6 @@ private:
 	Color m_tint;
 };
 
-//DrawTexturePro(Texture2D, Rectangle, Rectangle, Vector2, float, Color);
-
-
 
 namespace game {
 	namespace drawing {

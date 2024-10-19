@@ -1,9 +1,6 @@
 #pragma once
 #include "raylib.h"
-#include <vector>
 #include "utils.h"
-#include "Animator.h"
-#include "box2d/box2d.h"
 #include "Weapon.h"
 
 
@@ -25,6 +22,7 @@ namespace game {
             void setHealth(float value);
             void incHealth(float value);
             void decHealth(float value);
+            virtual void Draw();
             int kill();
             int revive();
             void setState(CharacterState new_state);

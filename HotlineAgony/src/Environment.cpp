@@ -1,6 +1,5 @@
 #include "Environment.h"
 #include "TexturePool.h"
-#include "box2d/box2d.h"
 #include <raymath.h>
 
 
@@ -98,14 +97,15 @@ void Environment::DrawTilemap(const Camera2D& camera, const Vector2& position) {
 				const Texture2D& tex = TexturePool::GetTexture(TexturePoolTextureType::Building, static_cast<int>(tile.texture));
 				float tile_size_x = tilemap.m_tile_width * tilemap_size_multiplier;
 				float tile_size_y = tilemap.m_tile_height * tilemap_size_multiplier;
-				float tile_pos_x = (tile_size_x * column) - (ENV_TILES_COUNT * tile_size_x) / 2.0f + tilemap.m_position.x;
-				float tile_pos_y = (tile_size_y * row) - (ENV_TILES_COUNT * tile_size_y) / 2.0f + tilemap.m_position.y;
+				Vector2 position = tilemap.getPosition();
+				float tile_pos_x = (tile_size_x * column) - (ENV_TILES_COUNT * tile_size_x) / 2.0f + position.x;
+				float tile_pos_y = (tile_size_y * row) - (ENV_TILES_COUNT * tile_size_y) / 2.0f + position.y;
 
 				if (tile.texture == TileType::WALL) {
 					tile_size_x *= 2;
 					tile_size_y *= 2;
 				}
-				DrawTexturePro(tex, Rectangle{ 0, 0, tilemap.m_tile_width, tilemap.m_tile_height },
+				DrawTexturePro(tex, Rectangle{0, 0, tilemap.m_tile_width, tilemap.m_tile_height},
 					Rectangle{ tile_pos_x, tile_pos_y, tile_size_x, tile_size_y },
 					Vector2{ tilemap.m_tile_width / 2, tilemap.m_tile_height / 2 }, 
 					static_cast<float>(tile.rotation), WHITE);
@@ -125,8 +125,9 @@ void Environment::InitTilemapHitboxes() {
 				if (tile.texture == TileType::WALL) {
 					float tile_size_x = tilemap.m_tile_width * tilemap_size_multiplier;
 					float tile_size_y = tilemap.m_tile_height * tilemap_size_multiplier;
-					float tile_pos_x = (tile_size_x * column) - (ENV_TILES_COUNT * tile_size_x) / 2.0f + tilemap.m_position.x;
-					float tile_pos_y = (tile_size_y * row) - (ENV_TILES_COUNT * tile_size_y) / 2.0f + tilemap.m_position.y;
+					Vector2 position = tilemap.getPosition();
+					float tile_pos_x = (tile_size_x * column) - (ENV_TILES_COUNT * tile_size_x) / 2.0f + position.x;
+					float tile_pos_y = (tile_size_y * row) - (ENV_TILES_COUNT * tile_size_y) / 2.0f + position.y;
 
 					b2BodyDef bodyWallDef;
 					bodyWallDef.type = b2_staticBody;
@@ -217,6 +218,13 @@ void Environment::DrawTexture(Texture2D texture, Vector2 position, Vector2 origi
 		rotation, WHITE);*/
 	DrawTexturePro(texture, Rectangle{ 0, 0, width, height },
 		Rectangle{ position.x, position.y, width * size, height * size },
+		Vector2{ origin.x, origin.y },
+		rotation, WHITE);
+}
+
+void Environment::DrawTexture(Texture2D texture, Vector2 position, Vector2 origin, float width, float height, float rotation) {
+	DrawTexturePro(texture, Rectangle{ 0, 0, width, height },
+		Rectangle{ position.x, position.y, width, height },
 		Vector2{ origin.x, origin.y },
 		rotation, WHITE);
 }

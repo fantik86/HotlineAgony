@@ -24,6 +24,7 @@ namespace game {
 			static void GameUpdate();
 			static b2World& GetPhysicsWorld();
 			static void DrawTexture(Texture2D texture, Vector2 position, Vector2 origin, float width, float height, float size, float rotation);
+			static void Environment::DrawTexture(Texture2D texture, Vector2 position, Vector2 origin, float width, float height, float rotation);
 			static void DrawHitboxes();
 			static void InitTilemapHitboxes();
 			static bool debug_draw_edges;

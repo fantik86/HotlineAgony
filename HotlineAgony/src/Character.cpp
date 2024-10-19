@@ -49,6 +49,10 @@ void Character::setWalkingDirectionY(float new_Y) {
 	walking_direction.y = new_Y;
 }
 
+void Character::Draw() {
+	TraceLog(8, "Character::Draw() called");
+}
+
 int Character::kill() {
 	m_health = 0;
 	return 0;

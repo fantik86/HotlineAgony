@@ -12,19 +12,19 @@ namespace game {
         {
         public:
             Tilemap(Vector2 position, float size, float tile_width, float tile_height);
-            Vector2 setPosition();
-            void getPosition() const;
+            void setPosition(Vector2 position);
+            Vector2 getPosition() const;
             void setSize();
             float getSize() const;
             Vector2 getTilePosition(const Tile& tile);
             inline TilemapBuffer_t* getBuffer() {
                 return buffer.get();
             }
-            Vector2 m_position;
             float m_size; ///< Size multiplier of entire tilemap
             float m_tile_width, m_tile_height; ///< Width and height of every tile in the tilemap
         private:
             std::unique_ptr<TilemapBuffer_t> buffer; ///< Stores info about all tiles
+            Vector2 m_position;
         };
     }
 }

@@ -13,7 +13,7 @@ void initWeapon(MeleeWeapon* weapon) {
 	bodyDef.position.Set(
 		weapon->GetPosition().x,
 		weapon->GetPosition().y);
-	b2Body* body = game::global::Environment::GetPhysicsWorld().CreateBody(&bodyDef);
+	b2Body* body = Environment::GetPhysicsWorld().CreateBody(&bodyDef);
 
 	b2PolygonShape shape;
 	shape.SetAsBox(weapon->m_physics_body_size.x, weapon->m_physics_body_size.y);
