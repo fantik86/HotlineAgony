@@ -84,7 +84,6 @@ void wp_Fists::Throw() {
 	TraceLog(8, "Throw activated");
 }
 
-
 void wp_Knife::Attack() {
 	TraceLog(8, "Attack activated");
 }

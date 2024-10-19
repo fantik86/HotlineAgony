@@ -12,44 +12,6 @@ Tilemap* Environment::m_tilemap = nullptr;
 bool Environment::debug_draw_edges = false;
 float Environment::tilemap_size_multiplier = 0.5f;
 
-// That class handles physics collisions 
-class ContactListener : public b2ContactListener {
-	void BeginContact(b2Contact* contact) override {
-		b2Fixture* a = contact->GetFixtureA();
-		b2Fixture* b = contact->GetFixtureB();
-		
-		// If user data is not set for any of objects
-		if (a->GetUserData().pointer == 0 || a->GetUserData().pointer == 0) {
-			return;
-		}
-		
-		const char* nameA = reinterpret_cast<PhysicsData*>(a->GetUserData().pointer)->name;
-		const char* nameB = reinterpret_cast<PhysicsData*>(b->GetUserData().pointer)->name;
-
-
-		b2Vec2 posA = a->GetBody()->GetPosition();
-		b2Vec2 posB = b->GetBody()->GetPosition();
-
-
-
-		float degrees = atan2(posA.y - posB.y, posA.x - posB.x) * RAD2DEG;
-
-		if (nameA == "Player" && nameB == "Weapon") {
-			b2Vec2 Velocity = b2Vec2(cos(degrees), sin(degrees));
-			Velocity *= 30;
-
-		}
-		else if (nameA == "Weapon" && nameB == "Player") {
-			b2Vec2 Velocity = b2Vec2(cos(degrees), sin(degrees));
-			Velocity *= 30;
-
-		}
-	}
-	void EndContact(b2Contact* contact) override {
-		TraceLog(8, "Ended collision");
-	}
-};
-
 void Environment::SetTilemap(Tilemap& tilemap) {
 	m_tilemap = &tilemap;
 }
