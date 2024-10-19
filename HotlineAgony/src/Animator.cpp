@@ -1,6 +1,7 @@
 #include <Animator.h>
 #include <raylib.h>
 
+
 std::vector<std::tuple<int, game::drawing::Animation, std::function<bool(void)>>> Animator::TaskBuffer = { };
 
 ///< Deleting animation from TaskBuffer

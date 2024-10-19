@@ -11,6 +11,8 @@ Character::Character() : m_health(100), m_max_health(100) {}
 
 Character::Character(float health) : m_health(health), m_max_health(health) {}
 
+Character::Character(float health, MeleeWeapon* weapon) : m_health(100), m_max_health(100), holdingWeapon(weapon) {}
+
 /**
 * @brief Returns \ref Character "Character's" health
 * @return m_health

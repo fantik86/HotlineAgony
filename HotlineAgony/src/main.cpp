@@ -83,14 +83,18 @@ int main(int argc, char** argv)
         b2Draw::e_shapeBit |
         b2Draw::e_jointBit |
         b2Draw::e_aabbBit |
-        b2Draw::e_pairBit |
         b2Draw::e_centerOfMassBit
     );
     
     Environment::GetPhysicsWorld().SetDebugDraw(&drawer);
 
     float defaultCameraZoom = (float)GetScreenWidth() / (float)GetScreenHeight() * 2.f;
-    
+
+    if (IsWindowFullscreen()) // Can ruin any attempts to change zoom in other place
+        plr.player_camera.zoom = defaultCameraZoom;
+    else
+        plr.player_camera.zoom = defaultCameraZoom * 0.7f;
+    wp_Knife* knifeTest = new wp_Knife(Vector2{0, -20});
 
     //-------------------------------------------------//
     //                    MAIN LOOP                    //
@@ -100,10 +104,7 @@ int main(int argc, char** argv)
     {
         Environment::GetPhysicsWorld().Step(GetFrameTime(), 6, 2);
 
-        if (IsWindowFullscreen()) // Can ruin any attempts to change zoom in other place
-            plr.player_camera.zoom = defaultCameraZoom;
-        else
-            plr.player_camera.zoom = defaultCameraZoom * 0.7f;
+        
 
         BeginDrawing();
 
@@ -119,6 +120,7 @@ int main(int argc, char** argv)
         
         Environment::DrawTilemap(plr.player_camera, plr.position);
 
+        WeaponHandler::DrawWeapons();
         EndMode2D();
 
         Animator::Update();

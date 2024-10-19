@@ -3,6 +3,7 @@
 #include "box2d/box2d.h"
 #include <raymath.h>
 
+
 using game::global::Environment;
 using game::global::TexturePool;
 using game::drawing::Tilemap;
@@ -11,7 +12,44 @@ Tilemap* Environment::m_tilemap = nullptr;
 bool Environment::debug_draw_edges = false;
 float Environment::tilemap_size_multiplier = 0.5f;
 std::unique_ptr<b2World> Environment::m_gamePhysicsWorld = std::make_unique<b2World>(b2Vec2_zero);
-std::vector<MeleeWeapon*> Environment::m_Weapons = {};
+
+// That class handles physics collisions 
+class ContactListener : public b2ContactListener {
+	void BeginContact(b2Contact* contact) override {
+		b2Fixture* a = contact->GetFixtureA();
+		b2Fixture* b = contact->GetFixtureB();
+		
+		// If user data is not set for any of objects
+		if (a->GetUserData().pointer == 0 || a->GetUserData().pointer == 0) {
+			return;
+		}
+		
+		const char* nameA = reinterpret_cast<PhysicsData*>(a->GetUserData().pointer)->name;
+		const char* nameB = reinterpret_cast<PhysicsData*>(b->GetUserData().pointer)->name;
+
+
+		b2Vec2 posA = a->GetBody()->GetPosition();
+		b2Vec2 posB = b->GetBody()->GetPosition();
+
+
+
+		float degrees = atan2(posA.y - posB.y, posA.x - posB.x) * RAD2DEG;
+
+		if (nameA == "Player" && nameB == "Weapon") {
+			b2Vec2 Velocity = b2Vec2(cos(degrees), sin(degrees));
+			Velocity *= 30;
+
+		}
+		else if (nameA == "Weapon" && nameB == "Player") {
+			b2Vec2 Velocity = b2Vec2(cos(degrees), sin(degrees));
+			Velocity *= 30;
+
+		}
+	}
+	void EndContact(b2Contact* contact) override {
+		TraceLog(8, "Ended collision");
+	}
+};
 
 void Environment::SetTilemap(Tilemap& tilemap) {
 	m_tilemap = &tilemap;
@@ -57,7 +95,6 @@ void Environment::DrawTilemap(const Camera2D& camera, const Vector2& position) {
 				if (tile.texture == TileType::AIR) {
 					continue;
 				}
-
 				const Texture2D& tex = TexturePool::GetTexture(TexturePoolTextureType::Building, static_cast<int>(tile.texture));
 				float tile_size_x = tilemap.m_tile_width * tilemap_size_multiplier;
 				float tile_size_y = tilemap.m_tile_height * tilemap_size_multiplier;
@@ -112,6 +149,7 @@ void Environment::InitTilemapHitboxes() {
 			}
 		}
 	}
+	m_gamePhysicsWorld.get()->SetContactListener(new ContactListener);
 }
 
 void Environment::setTilemapTileTexture(int x, int y, TILEMAP_LAYER layer, TileType texture, TileRotation rotation) {

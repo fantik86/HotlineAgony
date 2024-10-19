@@ -4,6 +4,9 @@
 #include "utils.h"
 #include "Animator.h"
 #include "box2d/box2d.h"
+#include "Weapon.h"
+
+
 
 namespace game {
     namespace living {
@@ -15,6 +18,7 @@ namespace game {
         public:
             Character();
             Character(float health);
+            Character(float health, MeleeWeapon* weapon);
             float getHealth() const;
             int getWalkspeed() const;
             void setWalkspeed(int value);
@@ -23,8 +27,8 @@ namespace game {
             void decHealth(float value);
             int kill();
             int revive();
-            CharacterState getState() const;
             void setState(CharacterState new_state);
+            CharacterState getState() const;
             Vector2 getWalkingDirection() const;
             const Tile& getStandingTile(); ///< Get the tile where character stading on
             Vector2 getStandingTilePos();
@@ -37,14 +41,16 @@ namespace game {
             void setWalkingDirectionX(float new_X);
             void setWalkingDirectionY(float new_Y);
             Vector2 walking_direction = { 0, 0 };
-            float character_size = 0.95f; 
-            int walkspeed = 300; ///< Character speed.
-            float m_health; ///< Character health. Game will define Character as dead, if health <= 0.
-            const float m_max_health; ///< Max health of the character.
-            //const int& low_health;        TODO: L2
-            bool moving = false; ///< Is Character moving right now
-            bool isInvincible = false; ///< Is Character can be killed
-            CharacterState state = CharacterState::Idle; ///< Character state
+            float character_size = 0.95f;
+            MeleeWeapon* holdingWeapon = new wp_Knife(); ///< Fists as default player weapon.
+            bool flipAttack = false;
+            int walkspeed = 300;                ///< Character speed.
+            float m_health;                     ///< Character health. Game will define Character as dead, if health <= 0.
+            const float m_max_health;           ///< Max health of the character.
+            //const int& low_health;            ///< Maybe TBA in future
+            bool moving = false;                ///< Is Character moving right now
+            bool isInvincible = false;          ///< Is Character cant be killed
+            CharacterState state = CharacterState::Idle; ///< Current character state, animation, death, attack and other things are depends on state.
             CharacterAppearance appearance = CharacterAppearance::russian_mafia; ///< Character \ref Animation set
         };
     }

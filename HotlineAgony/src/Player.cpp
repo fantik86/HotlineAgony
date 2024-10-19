@@ -31,7 +31,7 @@ void Player::Draw() {
 
     Environment::DrawTexture(playerLegsTexture, position, Vector2{ 16, 16 }, legs_width, legs_height, character_size, legs_direction);
     Environment::DrawTexture(playerBodyTexture, position, Vector2{ 16, 16 }, body_width, body_height, character_size, character_direction * RAD2DEG);
-
+    
     EndMode2D();
     bool isCameraPressed = IsKeyDown(std::get<KeyboardKey>(controls.camera));
 
@@ -68,7 +68,22 @@ void Player::updateKeyPress() {
     if (IsKeyPressed(KEY_F2)) {
         Environment::debug_draw_edges = !Environment::debug_draw_edges;
     }
+    
 
+    float mouseWheelMove = GetMouseWheelMove();
+    float zoomStep = 1.f / 3.f;
+    if (mouseWheelMove > 0) {
+        mouseWheelZoom += zoomStep;
+    }
+    else if (mouseWheelMove < 0) {
+        mouseWheelZoom -= zoomStep;
+    }
+
+    float defaultCameraZoom = (float)GetScreenWidth() / (float)GetScreenHeight() * 2.f * 0.7f;
+
+    mouseWheelZoom = Clamp(mouseWheelZoom, 1, 2);
+    //player_camera.zoom = Clamp(mouseWheelZoom * defaultCameraZoom, defaultCameraZoom, 10);
+    player_camera.zoom = Lerp(player_camera.zoom, mouseWheelZoom * defaultCameraZoom, 0.4);
 
     // Player movement
     if (canControl) {
@@ -80,6 +95,22 @@ void Player::updateKeyPress() {
         float move_step = getWalkspeed() * GetFrameTime();
 
         b2Vec2 velocity(0.f, 0.f);
+
+        if (IsMouseButtonPressed(std::get<MouseButton>(controls.item_throw))) {
+            if (holdingWeapon->m_weapon_name == "wp_Fists") { ///< Weapon take
+                // TODO: add something here
+            }
+            else { ///< Weapon throw/drop
+                int random_rotate = std::rand() % 2;
+                holdingWeapon->SetOnGround(true);
+                holdingWeapon->SetPhysicsBodyPosition(b2Vec2(position.x, position.y));
+                holdingWeapon->GetPhysicsBody()->SetTransform(holdingWeapon->GetPhysicsBody()->GetPosition(), holdingWeapon->GetPhysicsBody()->GetAngle());
+                holdingWeapon->GetPhysicsBody()->SetAngularVelocity(random_rotate == 1 ? 2 : -2);
+                
+                holdingWeapon = new wp_Fists();
+
+            }
+        }
 
         if (isLeftPressed && !isRightPressed) {
             player_camera.offset.x = Lerp(player_camera.offset.x, player_camera.offset.x - 50, 0.05f);
