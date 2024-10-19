@@ -22,7 +22,6 @@ namespace game {
 			static void FillTilemapSquare(int begin_x, int begin_y, int end_x, int end_y, TILEMAP_LAYER layer, TileType texture, TileRotation rotation);
 			static void setTilemapTileTexture(int x, int y, TILEMAP_LAYER layer, TileType texture, TileRotation rotation);
 			static void GameUpdate();
-			static b2World& GetPhysicsWorld();
 			static void DrawTexture(Texture2D texture, Vector2 position, Vector2 origin, float width, float height, float size, float rotation);
 			static void Environment::DrawTexture(Texture2D texture, Vector2 position, Vector2 origin, float width, float height, float rotation);
 			static void DrawHitboxes();
@@ -31,13 +30,7 @@ namespace game {
 		private:
 			static Tilemap* m_tilemap;
 			static float tilemap_size_multiplier;
-			static std::unique_ptr<b2World> m_gamePhysicsWorld;
 			float dayTime = 0.0f; ///< Current day time. 0 for the 0:00 and 1 for the 23:59
 		};
 	}
 }
-
-struct PhysicsData {
-	const char* name;
-	void* owner;
-};

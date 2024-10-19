@@ -2,6 +2,7 @@
 #include "Character.h"
 #include "raylib.h"
 #include "Environment.h"
+#include "PhysicsWorld.h"
 #include "Animation.h"
 #include "Animator.h"
 #include <string>
@@ -66,7 +67,7 @@ namespace game {
 
                 b2BodyDef bodyPlayerDef;
                 bodyPlayerDef.type = b2_dynamicBody;
-                physics_body = game::global::Environment::GetPhysicsWorld().CreateBody(&bodyPlayerDef);
+                physics_body = PhysicsWorld::GetWorld().CreateBody(&bodyPlayerDef);
 
                 b2CircleShape player_shape;
                 player_shape.m_radius = 8.f;

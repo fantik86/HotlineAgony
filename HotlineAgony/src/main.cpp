@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "options.h"
 #include "Environment.h"
+#include "PhysicsWorld.h"
 #include "TexturePool.h"
 #include "box2d/box2d.h"
 #include "GUI.h"
@@ -86,7 +87,7 @@ int main(int argc, char** argv)
         b2Draw::e_centerOfMassBit
     );
     
-    Environment::GetPhysicsWorld().SetDebugDraw(&drawer);
+    PhysicsWorld::GetWorld().SetDebugDraw(&drawer);
 
     float defaultCameraZoom = (float)GetScreenWidth() / (float)GetScreenHeight() * 2.f;
 
@@ -102,7 +103,7 @@ int main(int argc, char** argv)
 
     while (!WindowShouldClose())
     {
-        Environment::GetPhysicsWorld().Step(GetFrameTime(), 6, 2);
+        PhysicsWorld::GetWorld().Step(GetFrameTime(), 6, 2);
 
         
 

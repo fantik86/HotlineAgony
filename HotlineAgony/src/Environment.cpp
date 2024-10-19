@@ -1,4 +1,5 @@
 #include "Environment.h"
+#include "PhysicsWorld.h"
 #include "TexturePool.h"
 #include <raymath.h>
 
@@ -10,7 +11,6 @@ using game::drawing::Tilemap;
 Tilemap* Environment::m_tilemap = nullptr;
 bool Environment::debug_draw_edges = false;
 float Environment::tilemap_size_multiplier = 0.5f;
-std::unique_ptr<b2World> Environment::m_gamePhysicsWorld = std::make_unique<b2World>(b2Vec2_zero);
 
 // That class handles physics collisions 
 class ContactListener : public b2ContactListener {
@@ -132,7 +132,7 @@ void Environment::InitTilemapHitboxes() {
 					b2BodyDef bodyWallDef;
 					bodyWallDef.type = b2_staticBody;
 					bodyWallDef.position.Set(tile_pos_x, tile_pos_y);
-					b2Body* wallbody = Environment::GetPhysicsWorld().CreateBody(&bodyWallDef);
+					b2Body* wallbody = PhysicsWorld::GetWorld().CreateBody(&bodyWallDef);
 					float tile_rotation_rad = DEG2RAD * static_cast<float>(tile.rotation);
 					wallbody->SetTransform(b2Vec2(tile_pos_x - 12 * cos(tile_rotation_rad), tile_pos_y - 12 * sin(tile_rotation_rad)), tile_rotation_rad);
 
@@ -150,7 +150,7 @@ void Environment::InitTilemapHitboxes() {
 			}
 		}
 	}
-	m_gamePhysicsWorld.get()->SetContactListener(new ContactListener);
+	PhysicsWorld::GetWorld().SetContactListener(new ContactListener);
 }
 
 void Environment::setTilemapTileTexture(int x, int y, TILEMAP_LAYER layer, TileType texture, TileRotation rotation) {
@@ -229,12 +229,8 @@ void Environment::DrawTexture(Texture2D texture, Vector2 position, Vector2 origi
 		rotation, WHITE);
 }
 
-b2World& Environment::GetPhysicsWorld() {
-	return *m_gamePhysicsWorld;
-}
-
 void Environment::DrawHitboxes() {
-	m_gamePhysicsWorld.get()->DebugDraw();
+	PhysicsWorld::GetWorld().DebugDraw();
 }
 
 inline void Environment::GameUpdate() {

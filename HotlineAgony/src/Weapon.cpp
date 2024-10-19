@@ -1,9 +1,7 @@
 #include "Weapon.h"
-#include "Environment.h"
+#include "PhysicsWorld.h"
 
 std::vector<MeleeWeapon*> WeaponHandler::m_Weapons = { };
-
-using game::global::Environment;
 
 void initWeapon(MeleeWeapon* weapon) {
 	b2BodyDef bodyDef;
@@ -13,7 +11,7 @@ void initWeapon(MeleeWeapon* weapon) {
 	bodyDef.position.Set(
 		weapon->GetPosition().x,
 		weapon->GetPosition().y);
-	b2Body* body = Environment::GetPhysicsWorld().CreateBody(&bodyDef);
+	b2Body* body = PhysicsWorld::GetWorld().CreateBody(&bodyDef);
 
 	b2PolygonShape shape;
 	shape.SetAsBox(weapon->m_physics_body_size.x, weapon->m_physics_body_size.y);
@@ -58,11 +56,14 @@ void WeaponHandler::DrawWeapons() {
 				physics_body_pos.y - offsetY
 				});
 
-			Environment::DrawTexture(weapon->GetLyingSprite(), Vector2{ weapon_pos.x, weapon_pos.y },
-				Vector2{ static_cast<float>(sprite_width / 2),
-				static_cast<float>(sprite_height / 2) },
-				sprite_width, sprite_height,
-				1.3f, angle * RAD2DEG);
+			DrawTexturePro(weapon->GetLyingSprite(), Rectangle{ 0, 0,
+				static_cast<float>(weapon->GetLyingSprite().width),
+				static_cast<float>(weapon->GetLyingSprite().height) },
+				Rectangle{ weapon_pos.x, weapon_pos.y,
+				static_cast<float>(sprite_width),
+				static_cast<float>(sprite_height) }, Vector2{
+					static_cast<float>(sprite_width / 2),
+					static_cast<float>(sprite_height / 2) }, angle * RAD2DEG, WHITE);
 		}
 	}
 }
