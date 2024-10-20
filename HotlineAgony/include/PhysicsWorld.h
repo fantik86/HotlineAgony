@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <string>
 #include <raylib.h>
 #include <box2d/box2d.h>
 
@@ -29,16 +30,11 @@ class ContactListener : public b2ContactListener {
 		const char* nameA = reinterpret_cast<PhysicsData*>(a->GetUserData().pointer)->name;
 		const char* nameB = reinterpret_cast<PhysicsData*>(b->GetUserData().pointer)->name;
 
-		b2Vec2 posA = a->GetBody()->GetPosition();
-		b2Vec2 posB = b->GetBody()->GetPosition();
-		float degrees = atan2(posA.y - posB.y, posA.x - posB.x) * RAD2DEG;
-		b2Vec2 Velocity = b2Vec2(cos(degrees), sin(degrees));
-
 		if (nameA == "Player" && nameB == "Weapon") {
-			Velocity *= 30;
+			b->SetSensor(true);
 		}
 		else if (nameA == "Weapon" && nameB == "Player") {
-			Velocity *= 30;
+			a->SetSensor(true);
 		}
 	}
 	void EndContact(b2Contact* contact) override {
@@ -52,11 +48,22 @@ class ContactListener : public b2ContactListener {
 		const char* nameA = reinterpret_cast<PhysicsData*>(a->GetUserData().pointer)->name;
 		const char* nameB = reinterpret_cast<PhysicsData*>(b->GetUserData().pointer)->name;
 
+		b2Vec2 posA = a->GetBody()->GetPosition();
+		b2Vec2 posB = b->GetBody()->GetPosition();
+		float degrees = atan2(posA.y - posB.y, posA.x - posB.x) * RAD2DEG;
+		b2Vec2 Velocity = b2Vec2(cos(degrees), sin(degrees));
 		if (nameA == "Player" && nameB == "Weapon") {
-			b->SetSensor(false);
+			Velocity *= 15;
+			b->SetSensor(true);
+			b->GetBody()->SetLinearVelocity(Velocity);
+			b->GetBody()->SetAngularVelocity(rand() % 2 == 0 ? rand() % 2 + 2 : -(rand() % 2 + 2));
 		}
 		else if (nameA == "Weapon" && nameB == "Player") {
-			a->SetSensor(false);
+			Velocity *= 15;
+			a->SetSensor(true);
+			a->GetBody()->SetLinearVelocity(Velocity);
+			a->GetBody()->SetAngularVelocity(rand() % 2 == 0 ? rand() % 2 + 2 : -(rand() % 2 + 2));
 		}
+		
 	}
 };

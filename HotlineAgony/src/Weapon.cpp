@@ -59,7 +59,8 @@ void WeaponHandler::DrawWeapons() {
 			DrawTexturePro(weapon->GetLyingSprite(), Rectangle{ 0, 0,
 				static_cast<float>(weapon->GetLyingSprite().width),
 				static_cast<float>(weapon->GetLyingSprite().height) },
-				Rectangle{ weapon_pos.x, weapon_pos.y,
+				Rectangle{ weapon_pos.x + offsetX,
+				weapon_pos.y + offsetY,
 				static_cast<float>(sprite_width),
 				static_cast<float>(sprite_height) }, Vector2{
 					static_cast<float>(sprite_width / 2),
