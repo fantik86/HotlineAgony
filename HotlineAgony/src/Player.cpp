@@ -1,9 +1,5 @@
 #include "Player.h"
-#include "options.h"
-#include "raylib.h"
-#include "raymath.h"
-#include "Environment.h"
-#include <iostream>
+
 
 using game::living::Player;
 using game::global::Environment;
@@ -98,7 +94,9 @@ void Player::updateKeyPress() {
 
         if (IsMouseButtonPressed(std::get<MouseButton>(controls.item_throw))) {
             if (holdingWeapon->m_weapon_name == "wp_Fists") { ///< Weapon take
-                // TODO: add something here
+                if (m_collidingWeapons.size() > 0) {
+                    holdingWeapon = m_collidingWeapons.at(0);
+                }
             }
             else { ///< Weapon throw/drop
                 int random_rotate = std::rand() % 2;

@@ -34,6 +34,7 @@ namespace game {
             Texture2D playerBodyTexture = { 0 };
             Texture2D playerLegsTexture = { 0 };
             b2Body* physics_body = { 0 };
+            std::vector<MeleeWeapon*> m_collidingWeapons;
         protected:
             void setWalkingDirection(Vector2 new_walking_direction);
             void setWalkingDirectionX(float new_X);

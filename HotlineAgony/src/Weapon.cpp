@@ -25,10 +25,10 @@ void initWeapon(MeleeWeapon* weapon) {
 	fixture.isSensor = true;
 
 	b2FixtureUserData userData;
-	PhysicsData* data = new PhysicsData();
-	data->name = "Weapon";
-	data->owner = weapon;
-	userData.pointer = reinterpret_cast<uintptr_t>(data);
+	PhysicsData* metadata = new PhysicsData();
+	metadata->name = "Weapon";
+	metadata->owner = weapon;
+	userData.pointer = reinterpret_cast<uintptr_t>(metadata);
 
 	fixture.userData = userData;
 

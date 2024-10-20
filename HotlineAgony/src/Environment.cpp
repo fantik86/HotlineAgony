@@ -1,5 +1,6 @@
 #include "Environment.h"
 #include "PhysicsWorld.h"
+#include "CollisionHandler.h"
 #include "TexturePool.h"
 #include <raymath.h>
 

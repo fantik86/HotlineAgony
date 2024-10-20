@@ -104,7 +104,6 @@ int main(int argc, char** argv)
     while (!WindowShouldClose())
     {
         PhysicsWorld::GetWorld().Step(GetFrameTime(), 6, 2);
-
         
 
         BeginDrawing();

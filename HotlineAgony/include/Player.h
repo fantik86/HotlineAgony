@@ -1,11 +1,11 @@
 #pragma once
-#include "Character.h"
 #include "raylib.h"
-#include "Environment.h"
+#include "raymath.h"
+#include "Character.h"
 #include "PhysicsWorld.h"
+#include "Environment.h"
 #include "Animation.h"
 #include "Animator.h"
-#include <string>
 
 using game::living::Character;
 using game::drawing::Animation;
@@ -16,7 +16,6 @@ struct CameraInfo {
     float speed = 0.3f;
     float fly_length = 0.55f;
 };
-
 
 namespace game {
     namespace living {
@@ -78,10 +77,10 @@ namespace game {
                 fixture.friction = 0.5f;
                 
                 b2FixtureUserData userData;
-                PhysicsData* data = new PhysicsData();
-                data->name = "Player";
-                data->owner = this;
-                userData.pointer = reinterpret_cast<uintptr_t>(data);
+                PhysicsData* metadata = new PhysicsData();
+                metadata->name = "Player";
+                metadata->owner = this;
+                userData.pointer = reinterpret_cast<uintptr_t>(metadata);
 
                 fixture.userData = userData;
 
@@ -99,7 +98,6 @@ namespace game {
             float mouseWheelZoom = 1.f;
         private:
             bool canControl = true;
-            std::vector<MeleeWeapon*> collidingWeapons;
         };
     }
 }
