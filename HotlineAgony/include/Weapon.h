@@ -4,35 +4,20 @@
 #include <string>
 #include <vector>
 
-class MeleeWeapon;
-
-class WeaponHandler {
-public:
-	static void DrawWeapons();
-	static void AddWeapon(MeleeWeapon* weapon);
-private:
-	static std::vector<MeleeWeapon*> m_Weapons;
-};
 
 class MeleeWeapon {
 protected:
 	MeleeWeapon() :
 		m_lyingSprite(LoadTexture(std::string(GetApplicationDirectory()).append("/assets/weapons/wp_Unknown.png").c_str())),
-		m_weapon_name("wp_Unknown") {
-		WeaponHandler::AddWeapon(this);
-	}
+		m_weapon_name("wp_Unknown") {}
 
 	MeleeWeapon(std::string weapon_name) :
 		m_lyingSprite(LoadTexture(std::string(GetApplicationDirectory()).append("/assets/weapons/wp_Unknown.png").c_str())),
-		m_weapon_name(weapon_name) {
-		WeaponHandler::AddWeapon(this);
-	}
+		m_weapon_name(weapon_name) {}
 
 	MeleeWeapon(std::string weapon_name, Texture2D lyingSprite) :
 		m_lyingSprite(lyingSprite), 
-		m_weapon_name(weapon_name) {
-		WeaponHandler::AddWeapon(this);
-	}
+		m_weapon_name(weapon_name) {}
 
 
 	Vector2 m_position = Vector2{ 0, 0 };

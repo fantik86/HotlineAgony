@@ -2,6 +2,7 @@
 #include "raylib.h"
 #include "utils.h"
 #include "Weapon.h"
+#include "WeaponHandler.h"
 
 
 
@@ -41,7 +42,7 @@ namespace game {
             void setWalkingDirectionY(float new_Y);
             Vector2 walking_direction = { 0, 0 };
             float character_size = 0.95f;
-            MeleeWeapon* holdingWeapon = new wp_Knife(); ///< Fists as default player weapon.
+            MeleeWeapon* holdingWeapon = WeaponHandler::CreateWeapon<wp_Fists>(Vector2{ 0, 0 }); ///< Fists as default player weapon.
             bool flipAttack = false;
             int walkspeed = 300;                ///< Character speed.
             float m_health;                     ///< Character health. Game will define Character as dead, if health <= 0.

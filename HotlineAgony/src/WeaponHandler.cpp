@@ -1,0 +1,91 @@
+#include "WeaponHandler.h"
+#include "PhysicsWorld.h"
+
+
+std::vector<MeleeWeapon*> WeaponHandler::m_Weapons = { };
+
+void initWeapon(MeleeWeapon* weapon) {
+	b2BodyDef bodyDef;
+	bodyDef.linearDamping = 5.f;
+	bodyDef.angularDamping = 5.f;
+	bodyDef.type = b2_dynamicBody;
+	bodyDef.position.Set(
+		weapon->GetPosition().x,
+		weapon->GetPosition().y);
+	b2Body* body = PhysicsWorld::GetWorld().CreateBody(&bodyDef);
+
+	b2PolygonShape shape;
+	shape.SetAsBox(weapon->m_physics_body_size.x, weapon->m_physics_body_size.y);
+
+
+	b2FixtureDef fixture;
+	fixture.shape = &shape;
+	fixture.density = 50.f;
+	fixture.friction = 1.0f;
+	fixture.restitution = 0.1f; // Force of bouncing item off the other hitboxes
+	fixture.isSensor = true;
+
+	b2FixtureUserData userData;
+	PhysicsData* metadata = new PhysicsData();
+	metadata->name = "Weapon";
+	metadata->owner = weapon;
+	userData.pointer = reinterpret_cast<uintptr_t>(metadata);
+
+	fixture.userData = userData;
+
+	body->CreateFixture(&fixture);
+	weapon->SetPhysicsBody(body);
+}
+
+template <class WeaponType>
+WeaponType* WeaponHandler::CreateWeapon(Vector2 position) {
+	static_assert(std::is_base_of<MeleeWeapon, WeaponType>::value,
+		"Weapon can't be created, if WeaponType contains class that isn't inherited from MeleeWeapon.");
+
+	WeaponType* weapon = new WeaponType();
+	weapon->SetPosition(position);
+	initWeapon(weapon);
+	AddWeapon(weapon);
+
+	return weapon;
+
+}
+
+void WeaponHandler::DrawWeapons() {
+	for (auto& weapon : m_Weapons) {
+		if (weapon->isOnGround()) {
+			Vector2 align_center = weapon->m_physics_body_align_center;
+			float angle = weapon->GetPhysicsBody()->GetAngle();
+			float offsetX = align_center.x * cos(angle) - align_center.y * sin(angle);
+			float offsetY = align_center.x * sin(angle) + align_center.y * cos(angle);
+			int sprite_width = weapon->GetLyingSprite().width;
+			int sprite_height = weapon->GetLyingSprite().height;
+			b2Vec2 physics_body_pos = weapon->GetPhysicsBody()->GetPosition();
+			Vector2 weapon_pos = weapon->GetPosition();
+
+			weapon->SetPosition(Vector2{
+				physics_body_pos.x - offsetX,
+				physics_body_pos.y - offsetY
+				});
+
+			DrawTexturePro(weapon->GetLyingSprite(), Rectangle{ 0, 0,
+				static_cast<float>(weapon->GetLyingSprite().width),
+				static_cast<float>(weapon->GetLyingSprite().height) },
+				Rectangle{ weapon_pos.x + offsetX,
+				weapon_pos.y + offsetY,
+				static_cast<float>(sprite_width),
+				static_cast<float>(sprite_height) }, Vector2{
+					static_cast<float>(sprite_width / 2),
+					static_cast<float>(sprite_height / 2) }, angle * RAD2DEG, WHITE);
+		}
+	}
+}
+
+
+
+template wp_Knife* WeaponHandler::CreateWeapon<wp_Knife>(Vector2 position);
+template wp_Fists* WeaponHandler::CreateWeapon<wp_Fists>(Vector2 position);
+
+void WeaponHandler::AddWeapon(MeleeWeapon* weapon) {
+	m_Weapons.push_back(weapon);
+}

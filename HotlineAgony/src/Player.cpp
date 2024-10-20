@@ -96,6 +96,7 @@ void Player::updateKeyPress() {
             if (holdingWeapon->m_weapon_name == "wp_Fists") { ///< Weapon take
                 if (m_collidingWeapons.size() > 0) {
                     holdingWeapon = m_collidingWeapons.at(0);
+                    holdingWeapon->SetOnGround(false);
                 }
             }
             else { ///< Weapon throw/drop

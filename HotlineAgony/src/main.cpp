@@ -6,6 +6,7 @@
 #include "TexturePool.h"
 #include "box2d/box2d.h"
 #include "GUI.h"
+#include "WeaponHandler.h"
 #include "b2DrawRayLib.hpp"
 
 void testfunc(int logLevel, const char* text, va_list args) {
@@ -95,7 +96,8 @@ int main(int argc, char** argv)
         plr.player_camera.zoom = defaultCameraZoom;
     else
         plr.player_camera.zoom = defaultCameraZoom * 0.7f;
-    wp_Knife* knifeTest = new wp_Knife(Vector2{0, -20});
+
+    WeaponHandler::CreateWeapon<wp_Knife>(Vector2{0, 50});
 
     //-------------------------------------------------//
     //                    MAIN LOOP                    //
