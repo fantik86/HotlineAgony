@@ -91,7 +91,6 @@ void Player::updateKeyPress() {
         float move_step = getWalkspeed() * GetFrameTime();
 
         b2Vec2 velocity(0.f, 0.f);
-
         if (IsMouseButtonPressed(std::get<MouseButton>(controls.item_throw))) {
             if (holdingWeapon->m_weapon_name == "wp_Fists") { ///< Weapon take
                 if (m_collidingWeapons.size() > 0) {
@@ -101,11 +100,19 @@ void Player::updateKeyPress() {
             }
             else { ///< Weapon throw/drop
                 int random_rotate = std::rand() % 2;
+                float random_drop_direction = std::rand() % 360;
                 holdingWeapon->SetOnGround(true);
                 holdingWeapon->SetPhysicsBodyPosition(b2Vec2(position.x, position.y));
-                holdingWeapon->GetPhysicsBody()->SetTransform(holdingWeapon->GetPhysicsBody()->GetPosition(), holdingWeapon->GetPhysicsBody()->GetAngle());
+                //holdingWeapon->GetPhysicsBody()->SetTransform(b2Vec2(position.x, position.y), holdingWeapon->GetPhysicsBody()->GetAngle());
                 holdingWeapon->GetPhysicsBody()->SetAngularVelocity(random_rotate == 1 ? 2 : -2);
+
+                float dropLength = 40.f;
+
+                b2Vec2 dropVelocity(cos(random_drop_direction * DEG2RAD) * dropLength, 
+                    sin(random_drop_direction * DEG2RAD) * dropLength);
                 
+
+                holdingWeapon->GetPhysicsBody()->SetLinearVelocity(dropVelocity);
                 holdingWeapon = new wp_Fists();
 
             }

@@ -11,7 +11,7 @@ namespace game {
         class Tilemap
         {
         public:
-            Tilemap(Vector2 position, float size, float tile_width, float tile_height);
+            Tilemap(Vector2 position, float tile_width, float tile_height);
             void setPosition(Vector2 position);
             Vector2 getPosition() const;
             void setSize();

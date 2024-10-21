@@ -44,7 +44,7 @@ namespace game {
             float character_size = 0.95f;
             MeleeWeapon* holdingWeapon = WeaponHandler::CreateWeapon<wp_Fists>(Vector2{ 0, 0 }); ///< Fists as default player weapon.
             bool flipAttack = false;
-            int walkspeed = 300;                ///< Character speed.
+            int walkspeed = 120;                ///< Character speed.
             float m_health;                     ///< Character health. Game will define Character as dead, if health <= 0.
             const float m_max_health;           ///< Max health of the character.
             //const int& low_health;            ///< Maybe TBA in future

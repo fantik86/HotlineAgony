@@ -14,7 +14,6 @@ void testfunc(int logLevel, const char* text, va_list args) {
     vprintf(text, args);
     printf("\n");
 }
-
 using game::drawing::Tilemap;
 using game::global::Environment;
 using game::global::TexturePool;
@@ -40,7 +39,7 @@ int main(int argc, char** argv)
     TexturePool::AddTexture(TexturePoolTextureType::Building, static_cast<int>(TileType::FLOOR), std::move(LoadTexture((game_path + "/assets/buildings/floor.png").c_str())));
 
 
-    Tilemap tilemap(Vector2{0, 0}, 1, 32, 32);
+    Tilemap tilemap(Vector2{0, 0}, 32, 32);
 
     Environment::SetTilemap(tilemap);
     Environment::FillTilemap(TileType::UNKNOWN, TILEMAP_LAYER_FLOOR);
@@ -105,7 +104,7 @@ int main(int argc, char** argv)
 
     while (!WindowShouldClose())
     {
-        PhysicsWorld::GetWorld().Step(GetFrameTime(), 6, 2);
+        PhysicsWorld::GetWorld().Step(GetFrameTime() * TIME_SCALE, 6 * TIME_SCALE, 2 * TIME_SCALE);
         
 
         BeginDrawing();

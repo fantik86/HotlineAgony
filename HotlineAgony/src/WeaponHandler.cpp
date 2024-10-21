@@ -16,15 +16,15 @@ void initWeapon(MeleeWeapon* weapon) {
 
 	b2PolygonShape shape;
 	shape.SetAsBox(weapon->m_physics_body_size.x, weapon->m_physics_body_size.y);
-
-
+	
+	
 	b2FixtureDef fixture;
 	fixture.shape = &shape;
 	fixture.density = 50.f;
 	fixture.friction = 1.0f;
 	fixture.restitution = 0.1f; // Force of bouncing item off the other hitboxes
 	fixture.isSensor = true;
-
+	
 	b2FixtureUserData userData;
 	PhysicsData* metadata = new PhysicsData();
 	metadata->name = "Weapon";
@@ -58,25 +58,27 @@ void WeaponHandler::DrawWeapons() {
 			float angle = weapon->GetPhysicsBody()->GetAngle();
 			float offsetX = align_center.x * cos(angle) - align_center.y * sin(angle);
 			float offsetY = align_center.x * sin(angle) + align_center.y * cos(angle);
-			int sprite_width = weapon->GetLyingSprite().width;
-			int sprite_height = weapon->GetLyingSprite().height;
+			float sprite_width = static_cast<float>(weapon->GetLyingSprite().width);
+			float sprite_height = static_cast<float>(weapon->GetLyingSprite().height);
 			b2Vec2 physics_body_pos = weapon->GetPhysicsBody()->GetPosition();
-			Vector2 weapon_pos = weapon->GetPosition();
-
+			
 			weapon->SetPosition(Vector2{
 				physics_body_pos.x - offsetX,
 				physics_body_pos.y - offsetY
 				});
 
 			DrawTexturePro(weapon->GetLyingSprite(), Rectangle{ 0, 0,
-				static_cast<float>(weapon->GetLyingSprite().width),
-				static_cast<float>(weapon->GetLyingSprite().height) },
-				Rectangle{ weapon_pos.x + offsetX,
-				weapon_pos.y + offsetY,
-				static_cast<float>(sprite_width),
-				static_cast<float>(sprite_height) }, Vector2{
-					static_cast<float>(sprite_width / 2),
-					static_cast<float>(sprite_height / 2) }, angle * RAD2DEG, WHITE);
+				sprite_width,
+				sprite_height },
+				Rectangle{ weapon->GetPosition().x + offsetX,
+				weapon->GetPosition().y + offsetY,
+				sprite_width,
+				sprite_height }, Vector2{
+					sprite_width / 2,
+					sprite_height / 2 }, angle * RAD2DEG, WHITE);
+		}
+		else {
+			weapon->SetPhysicsBodyPosition(b2Vec2{ FLT_MAX, FLT_MAX });
 		}
 	}
 }
