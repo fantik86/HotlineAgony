@@ -7,19 +7,19 @@ using game::global::Environment;
 extern Camera2D worldcam;
 
 void Player::Draw() {
-	Vector2 mouse2world = GetScreenToWorld2D(GetMousePosition(), player_camera);
-    
-    
+    Vector2 mouse2world = GetScreenToWorld2D(GetMousePosition(), player_camera);
+
+
     float character_direction = atan2f(mouse2world.y - position.y,
         mouse2world.x - position.x); // Dont touch, i dont have idea how this hellish thing works!
 
     player_camera.target = position;
-    
+
     float body_width = static_cast<float>(playerBodyTexture.width);
     float body_height = static_cast<float>(playerBodyTexture.height);
     float legs_width = static_cast<float>(playerLegsTexture.width);
     float legs_height = static_cast<float>(playerLegsTexture.height);
-    
+
 
     float legs_direction = atan2(-walking_direction.y, walking_direction.x) * RAD2DEG;
 
@@ -27,7 +27,7 @@ void Player::Draw() {
 
     Environment::DrawTexture(playerLegsTexture, position, Vector2{ 16, 16 }, legs_width, legs_height, character_size, legs_direction);
     Environment::DrawTexture(playerBodyTexture, position, Vector2{ 16, 16 }, body_width, body_height, character_size, character_direction * RAD2DEG);
-    
+
     EndMode2D();
     bool isCameraPressed = IsKeyDown(std::get<KeyboardKey>(controls.camera));
 
@@ -57,14 +57,14 @@ void Player::updateKeyPress() {
             SetWindowSize(GetMonitorWidth(currentMonitor), GetMonitorHeight(currentMonitor));
         }
         ToggleFullscreen();
-        
+
         // This is need to prevent camera easing to player from down-right corner upon changing fullscreen
         player_camera.offset = Vector2{ GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
     }
     if (IsKeyPressed(KEY_F2)) {
         Environment::debug_draw_edges = !Environment::debug_draw_edges;
     }
-    
+
 
     float mouseWheelMove = GetMouseWheelMove();
     float zoomStep = 1.f / 3.f;
@@ -91,30 +91,70 @@ void Player::updateKeyPress() {
         float move_step = getWalkspeed() * GetFrameTime();
 
         b2Vec2 velocity(0.f, 0.f);
+        if (IsMouseButtonDown(std::get<MouseButton>(controls.item_throw))) {
+            if (dropTime == -1.0) {
+                dropTime = GetTime() + 1.0;
+            }
+            if (GetTime() > dropTime) {
+                if (holdingWeapon->m_weapon_name != "wp_Fists") {
+                    int random_rotate = std::rand() % 2;
+                    float random_drop_direction = std::rand() % 360;
+                    holdingWeapon->SetOnGround(true);
+                    holdingWeapon->SetPhysicsBodyPosition(b2Vec2(position.x, position.y));
+                    holdingWeapon->GetPhysicsBody()->SetAngularVelocity(random_rotate == 1 ? 2 : -2);
+
+                    float dropLength = 40.f;
+
+                    b2Vec2 dropVelocity(cos(random_drop_direction * DEG2RAD) * dropLength,
+                        sin(random_drop_direction * DEG2RAD) * dropLength);
+
+                    holdingWeapon->GetPhysicsBody()->SetLinearVelocity(dropVelocity);
+                    holdingWeapon = new wp_Fists();
+                }
+            }
+        }
+        else {
+            dropTime = -1.0;
+
+        }
+        
+        if (IsMouseButtonReleased(std::get<MouseButton>(controls.item_throw))) {
+            if (holdingWeapon->m_weapon_name != "wp_Fists") {
+                if (!justPickedUpWeapon) {
+                    justPickedUpWeapon = true;
+                    return;
+                }
+                int random_rotate = std::rand() % 2;
+                float random_drop_direction = std::rand() % 360;
+                holdingWeapon->SetOnGround(true);
+                holdingWeapon->SetPhysicsBodyPosition(b2Vec2(position.x, position.y));
+                holdingWeapon->GetPhysicsBody()->SetAngularVelocity(random_rotate == 1 ? 2 : -2);
+
+                float dropLength = 1600.f;
+
+                Vector2 mouse2world = GetScreenToWorld2D(GetMousePosition(), player_camera);
+
+
+                float character_direction = atan2f(mouse2world.y - position.y,
+                    mouse2world.x - position.x); // Dont touch, i dont have idea how this hellish thing works!
+
+
+                b2Vec2 dropVelocity(cos(character_direction) * dropLength,
+                    sin(character_direction) * dropLength);
+
+                holdingWeapon->GetPhysicsBody()->SetLinearVelocity(dropVelocity);
+                holdingWeapon->GetPhysicsBody()->ApplyAngularImpulse(100000, true);
+                holdingWeapon = new wp_Fists();
+            }
+        }
+
         if (IsMouseButtonPressed(std::get<MouseButton>(controls.item_throw))) {
             if (holdingWeapon->m_weapon_name == "wp_Fists") { ///< Weapon take
                 if (m_collidingWeapons.size() > 0) {
                     holdingWeapon = m_collidingWeapons.at(0);
                     holdingWeapon->SetOnGround(false);
+                    justPickedUpWeapon = false;
                 }
-            }
-            else { ///< Weapon throw/drop
-                int random_rotate = std::rand() % 2;
-                float random_drop_direction = std::rand() % 360;
-                holdingWeapon->SetOnGround(true);
-                holdingWeapon->SetPhysicsBodyPosition(b2Vec2(position.x, position.y));
-                //holdingWeapon->GetPhysicsBody()->SetTransform(b2Vec2(position.x, position.y), holdingWeapon->GetPhysicsBody()->GetAngle());
-                holdingWeapon->GetPhysicsBody()->SetAngularVelocity(random_rotate == 1 ? 2 : -2);
-
-                float dropLength = 40.f;
-
-                b2Vec2 dropVelocity(cos(random_drop_direction * DEG2RAD) * dropLength, 
-                    sin(random_drop_direction * DEG2RAD) * dropLength);
-                
-
-                holdingWeapon->GetPhysicsBody()->SetLinearVelocity(dropVelocity);
-                holdingWeapon = new wp_Fists();
-
             }
         }
 
@@ -220,5 +260,5 @@ void Player::updatePlayer() {
 }
 
 void Player::setCamera(Camera2D& camera) {
-	player_camera = camera;
+    player_camera = camera;
 }

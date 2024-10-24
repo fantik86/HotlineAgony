@@ -21,8 +21,8 @@ void initWeapon(MeleeWeapon* weapon) {
 	b2FixtureDef fixture;
 	fixture.shape = &shape;
 	fixture.density = 50.f;
-	fixture.friction = 1.0f;
-	fixture.restitution = 0.1f; // Force of bouncing item off the other hitboxes
+	fixture.friction = 1.f;
+	fixture.restitution = 0.5f; // Force of bouncing item off the other hitboxes
 	fixture.isSensor = true;
 	
 	b2FixtureUserData userData;

@@ -51,8 +51,10 @@ class ContactListener : public b2ContactListener {
 			Character* character = reinterpret_cast<Character*>(dataA->owner);
 			MeleeWeapon* weapon = reinterpret_cast<MeleeWeapon*>(dataB->owner);
 			Velocity *= 15;
-			b->SetSensor(true);
-			b->GetBody()->SetLinearVelocity(Velocity);
+			if (weapon->isOnGround()) {
+				b->SetSensor(false);
+			}
+			//b->GetBody()->SetLinearVelocity(Velocity);
 			b->GetBody()->SetAngularVelocity(rand() % 2 == 0 ? rand() % 2 + 2 : -(rand() % 2 + 2));
 			auto& weapon_in_vector_to_delete = std::find(character->m_collidingWeapons.begin(), character->m_collidingWeapons.end(), weapon);
 			character->m_collidingWeapons.erase(weapon_in_vector_to_delete);
@@ -61,8 +63,11 @@ class ContactListener : public b2ContactListener {
 			Character* character = reinterpret_cast<Character*>(dataB->owner);
 			MeleeWeapon* weapon = reinterpret_cast<MeleeWeapon*>(dataA->owner);
 			Velocity *= 15;
-			a->SetSensor(true);
-			a->GetBody()->SetLinearVelocity(Velocity);
+
+			if (weapon->isOnGround()) {
+				a->SetSensor(false);
+			}
+			//a->GetBody()->SetLinearVelocity(Velocity);
 			a->GetBody()->SetAngularVelocity(rand() % 2 == 0 ? rand() % 2 + 2 : -(rand() % 2 + 2));
 			auto& weapon_in_vector_to_delete = std::find(character->m_collidingWeapons.begin(), character->m_collidingWeapons.end(), weapon);
 			character->m_collidingWeapons.erase(weapon_in_vector_to_delete);
