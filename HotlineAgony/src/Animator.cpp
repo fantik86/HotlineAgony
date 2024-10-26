@@ -1,16 +1,16 @@
 #include <Animator.h>
 #include <raylib.h>
+#include <algorithm>
 
 
 std::vector<std::tuple<int, game::drawing::Animation, std::function<bool(void)>>> Animator::TaskBuffer = { };
 
 ///< Deleting animation from TaskBuffer
 void Animator::Stop(game::drawing::Animation animation) {
-	for (auto& it = TaskBuffer.begin(); it != TaskBuffer.end(); it++) {
-		if (std::get<1>((*it)) == animation) {
-			TaskBuffer.erase(it);
-		}
-	}
+    std::remove_if(TaskBuffer.begin(), TaskBuffer.end(),
+                   [animation](const std::tuple<int, game::drawing::Animation, std::function<bool()>>& v){
+        return std::get<1>(v) == animation;
+    });
 }
 
 void Animator::Add(int id, game::drawing::Animation animation, std::function<bool(void)> condition) {

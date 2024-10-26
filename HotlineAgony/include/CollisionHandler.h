@@ -1,5 +1,6 @@
 #include <box2d/box2d.h>
 #include "Character.h"
+#include <algorithm>
 
 using game::living::Character;
 
@@ -56,8 +57,10 @@ class ContactListener : public b2ContactListener {
 			}
 			//b->GetBody()->SetLinearVelocity(Velocity);
 			b->GetBody()->SetAngularVelocity(rand() % 2 == 0 ? rand() % 2 + 2 : -(rand() % 2 + 2));
-			auto& weapon_in_vector_to_delete = std::find(character->m_collidingWeapons.begin(), character->m_collidingWeapons.end(), weapon);
-			character->m_collidingWeapons.erase(weapon_in_vector_to_delete);
+            std::remove_if(character->m_collidingWeapons.begin(), character->m_collidingWeapons.end(),
+                           [weapon](MeleeWeapon* weapon_ptr) -> bool {
+                weapon_ptr == weapon;
+            });
 		}
 		else if (nameA == "Weapon" && nameB == "Player") {
 			Character* character = reinterpret_cast<Character*>(dataB->owner);
@@ -69,8 +72,10 @@ class ContactListener : public b2ContactListener {
 			}
 			//a->GetBody()->SetLinearVelocity(Velocity);
 			a->GetBody()->SetAngularVelocity(rand() % 2 == 0 ? rand() % 2 + 2 : -(rand() % 2 + 2));
-			auto& weapon_in_vector_to_delete = std::find(character->m_collidingWeapons.begin(), character->m_collidingWeapons.end(), weapon);
-			character->m_collidingWeapons.erase(weapon_in_vector_to_delete);
+            std::remove_if(character->m_collidingWeapons.begin(), character->m_collidingWeapons.end(),
+                           [weapon](MeleeWeapon* weapon_ptr) -> bool {
+                               weapon_ptr == weapon;
+            });
 		}
 
 	}
