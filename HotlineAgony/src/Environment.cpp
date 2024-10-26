@@ -94,8 +94,8 @@ void Environment::InitTilemapHitboxes() {
 
 					b2BodyDef bodyWallDef;
 					bodyWallDef.type = b2_staticBody;
-					bodyWallDef.position.Set(tile_pos_x, tile_pos_y);
 					b2Body* wallbody = PhysicsWorld::GetWorld().CreateBody(&bodyWallDef);
+
 					float tile_rotation_rad = DEG2RAD * static_cast<float>(tile.rotation);
 					wallbody->SetTransform(b2Vec2(tile_pos_x - 12 * cos(tile_rotation_rad), tile_pos_y - 12 * sin(tile_rotation_rad)), tile_rotation_rad);
 
@@ -106,7 +106,7 @@ void Environment::InitTilemapHitboxes() {
 					wallfixture.shape = &wallshape;
 					wallfixture.density = 1.0f;
 					wallfixture.friction = 0.3f;
-
+                    wallfixture.filter.categoryBits = 0x0004;
 
 					wallbody->CreateFixture(&wallfixture);
 				}

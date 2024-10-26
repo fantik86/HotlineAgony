@@ -23,8 +23,11 @@ void initWeapon(MeleeWeapon* weapon) {
 	fixture.density = 50.f;
 	fixture.friction = 1.f;
 	fixture.restitution = 0.5f; // Force of bouncing item off the other hitboxes
-	fixture.isSensor = true;
-	
+    fixture.isSensor = false;
+    fixture.filter.categoryBits = 0x0002;
+    fixture.filter.maskBits = 0x0008;
+
+
 	b2FixtureUserData userData;
 	PhysicsData* metadata = new PhysicsData();
 	metadata->name = "Weapon";
@@ -56,8 +59,8 @@ void WeaponHandler::DrawWeapons() {
 		if (weapon->isOnGround()) {
 			Vector2 align_center = weapon->m_physics_body_align_center;
 			float angle = weapon->GetPhysicsBody()->GetAngle();
-			float offsetX = align_center.x * cos(angle) - align_center.y * sin(angle);
-			float offsetY = align_center.x * sin(angle) + align_center.y * cos(angle);
+			float offsetX = align_center.x * cosf(angle) - align_center.y * sinf(angle);
+			float offsetY = align_center.x * sinf(angle) + align_center.y * cosf(angle);
 			float sprite_width = static_cast<float>(weapon->GetLyingSprite().width);
 			float sprite_height = static_cast<float>(weapon->GetLyingSprite().height);
 			b2Vec2 physics_body_pos = weapon->GetPhysicsBody()->GetPosition();

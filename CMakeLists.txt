@@ -57,7 +57,7 @@ add_dependencies(${PROJECT_NAME} copy_data)
 
 if (MSVC AND WIN32 AND NOT MSVC_VERSION VERSION_LESS 142)
     target_link_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)
-    target_compile_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:/ZI>)
+    target_compile_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:/Zi>)
 endif()
 
 target_sources(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCES} ${B2DRAWRAYLIB_SOURCES})

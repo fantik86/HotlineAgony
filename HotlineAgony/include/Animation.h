@@ -26,6 +26,7 @@ namespace game {
                 m_next_frame_time = b.m_next_frame_time;
                 m_frame_delay = b.m_frame_delay;
                 m_looped = b.m_looped;
+                m_animation_state = b.m_animation_state;
             }
         private:
             int m_current_frame;

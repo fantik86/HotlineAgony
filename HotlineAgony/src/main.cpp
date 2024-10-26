@@ -64,7 +64,6 @@ int main(int argc, char** argv)
 
 
     std::string font_path = game_path + "assets/fonts/Courier Prime.ttf";
-    Font textFont = LoadFontEx(font_path.c_str(), 64, 0, 255);
     b2BodyDef bodyPlayerDef;
     bodyPlayerDef.type = b2_dynamicBody;
 

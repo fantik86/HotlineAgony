@@ -88,7 +88,6 @@ void Player::updateKeyPress() {
         bool isUpPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_up));
         bool isDownPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_down));
 
-        float move_step = getWalkspeed() * GetFrameTime();
 
         b2Vec2 velocity(0.f, 0.f);
         if (IsMouseButtonDown(std::get<MouseButton>(controls.item_throw))) {
@@ -206,7 +205,9 @@ void Player::updateKeyPress() {
         if (isLeftPressed && isRightPressed) {
             setWalkingDirectionX(0.0f);
         }
+
         physics_body->SetLinearVelocity(velocity);
+        collision_body->SetTransform(physics_body->GetPosition(), 0.f);
     }
 }
 

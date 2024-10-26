@@ -73,20 +73,46 @@ namespace game {
                 b2CircleShape player_shape;
                 player_shape.m_radius = 8.f;
                 
-                b2FixtureDef fixture;
-                fixture.shape = &player_shape;
-                fixture.density = 1.f;
-                fixture.friction = 0.5f;
-                
+                b2FixtureDef plrFixture;
+                plrFixture.shape = &player_shape;
+                plrFixture.density = 1.f;
+                plrFixture.friction = 0.5f;
+                plrFixture.filter.categoryBits = 0x0001; // Player
+
                 b2FixtureUserData userData;
                 PhysicsData* metadata = new PhysicsData();
                 metadata->name = "Player";
                 metadata->owner = this;
                 userData.pointer = reinterpret_cast<uintptr_t>(metadata);
 
-                fixture.userData = userData;
+                plrFixture.userData = userData;
 
-                physics_body->CreateFixture(&fixture);
+                physics_body->CreateFixture(&plrFixture);
+
+                b2BodyDef bodyCollisionDef;
+                bodyCollisionDef.type = b2_dynamicBody;
+
+                b2CircleShape collision_shape;
+                collision_shape.m_radius = 26.f;
+
+                b2FixtureDef collisionFixture;
+                collisionFixture.shape = &collision_shape;
+                collisionFixture.density = 1.f;
+                collisionFixture.friction = 0.5f;
+                collisionFixture.isSensor = true;
+                collisionFixture.filter.categoryBits = 0x0008;
+                collisionFixture.filter.maskBits = 0x0002;
+
+                b2FixtureUserData collisionUserData;
+                PhysicsData* collisionMetadata = new PhysicsData();
+                collisionMetadata->name = "playerCollision";
+                collisionMetadata->owner = this;
+                collisionUserData.pointer = reinterpret_cast<uintptr_t>(collisionMetadata);
+
+                collisionFixture.userData = collisionUserData;
+
+                collision_body = PhysicsWorld::GetWorld().CreateBody(&bodyCollisionDef);
+                collision_body->CreateFixture(&collisionFixture);
             }
 
             void Draw() override;
@@ -99,6 +125,7 @@ namespace game {
             CameraInfo camera_info;
             float mouseWheelZoom = 1.f;
         private:
+            b2Body* collision_body = { 0 };
             bool canControl = true;
             bool justPickedUpWeapon = true;
             double dropTime = -1.0;

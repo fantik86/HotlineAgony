@@ -21,13 +21,11 @@ class ContactListener : public b2ContactListener {
 		PhysicsData* dataA = reinterpret_cast<PhysicsData*>(a->GetUserData().pointer);
 		PhysicsData* dataB = reinterpret_cast<PhysicsData*>(b->GetUserData().pointer);
 
-		if (nameA == "Player" && nameB == "Weapon") {
-			b->SetSensor(true);
+		if (nameA == "playerCollision" && nameB == "Weapon") {
 			reinterpret_cast<Character*>(dataA->owner)->m_collidingWeapons.push_back(reinterpret_cast<MeleeWeapon*>(dataB->owner));
 		}
-		else if (nameA == "Weapon" && nameB == "Player") {
-			a->SetSensor(true);
-			reinterpret_cast<Character*>(dataB->owner)->m_collidingWeapons.push_back(reinterpret_cast<MeleeWeapon*>(dataA->owner));
+		else if (nameA == "Weapon" && nameB == "playerCollision") {
+    			reinterpret_cast<Character*>(dataB->owner)->m_collidingWeapons.push_back(reinterpret_cast<MeleeWeapon*>(dataA->owner));
 		}
 	}
 
@@ -49,35 +47,24 @@ class ContactListener : public b2ContactListener {
 		b2Vec2 posB = b->GetBody()->GetPosition();
 		float degrees = atan2(posA.y - posB.y, posA.x - posB.x) * RAD2DEG;
 		b2Vec2 Velocity = b2Vec2(cos(degrees), sin(degrees));
-		if (nameA == "Player" && nameB == "Weapon") {
+		if (nameA == "playerCollision" && nameB == "Weapon") {
 			Character* character = reinterpret_cast<Character*>(dataA->owner);
 			MeleeWeapon* weapon = reinterpret_cast<MeleeWeapon*>(dataB->owner);
 			Velocity *= 15;
-			if (weapon->isOnGround()) {
-				b->SetSensor(false);
-			}
 			//b->GetBody()->SetLinearVelocity(Velocity);
 			b->GetBody()->SetAngularVelocity(rand() % 2 == 0 ? rand() % 2 + 2 : -(rand() % 2 + 2));
-            std::remove_if(character->m_collidingWeapons.begin(), character->m_collidingWeapons.end(),
-                           [weapon](MeleeWeapon* weapon_ptr) -> bool {
-                weapon_ptr == weapon;
-            });
+            auto it = std::find(character->m_collidingWeapons.begin(), character->m_collidingWeapons.end(), weapon);
+            character->m_collidingWeapons.erase(it);
 		}
-		else if (nameA == "Weapon" && nameB == "Player") {
+		else if (nameA == "Weapon" && nameB == "playerCollision") {
 			Character* character = reinterpret_cast<Character*>(dataB->owner);
 			MeleeWeapon* weapon = reinterpret_cast<MeleeWeapon*>(dataA->owner);
 			Velocity *= 15;
 
-			if (weapon->isOnGround()) {
-				a->SetSensor(false);
-			}
 			//a->GetBody()->SetLinearVelocity(Velocity);
 			a->GetBody()->SetAngularVelocity(rand() % 2 == 0 ? rand() % 2 + 2 : -(rand() % 2 + 2));
-            std::remove_if(character->m_collidingWeapons.begin(), character->m_collidingWeapons.end(),
-                           [weapon](MeleeWeapon* weapon_ptr) -> bool {
-                               weapon_ptr == weapon;
-                               return false;
-            });
+            auto it = std::find(character->m_collidingWeapons.begin(), character->m_collidingWeapons.end(), weapon);
+            character->m_collidingWeapons.erase(it);
 		}
 
 	}
