@@ -15,8 +15,8 @@ class ContactListener : public b2ContactListener {
 			return;
 		}
 
-		const char* nameA = reinterpret_cast<PhysicsData*>(a->GetUserData().pointer)->name;
-		const char* nameB = reinterpret_cast<PhysicsData*>(b->GetUserData().pointer)->name;
+		std::string nameA = reinterpret_cast<PhysicsData*>(a->GetUserData().pointer)->name;
+        std::string nameB = reinterpret_cast<PhysicsData*>(b->GetUserData().pointer)->name;
 
 		PhysicsData* dataA = reinterpret_cast<PhysicsData*>(a->GetUserData().pointer);
 		PhysicsData* dataB = reinterpret_cast<PhysicsData*>(b->GetUserData().pointer);
@@ -30,6 +30,7 @@ class ContactListener : public b2ContactListener {
 			reinterpret_cast<Character*>(dataB->owner)->m_collidingWeapons.push_back(reinterpret_cast<MeleeWeapon*>(dataA->owner));
 		}
 	}
+
 	void EndContact(b2Contact* contact) override {
 		b2Fixture* a = contact->GetFixtureA();
 		b2Fixture* b = contact->GetFixtureB();
@@ -41,8 +42,8 @@ class ContactListener : public b2ContactListener {
 		PhysicsData* dataA = reinterpret_cast<PhysicsData*>(a->GetUserData().pointer);
 		PhysicsData* dataB = reinterpret_cast<PhysicsData*>(b->GetUserData().pointer);
 
-		const char* nameA = dataA->name;
-		const char* nameB = dataB->name;
+        std::string nameA = dataA->name;
+        std::string nameB = dataB->name;
 
 		b2Vec2 posA = a->GetBody()->GetPosition();
 		b2Vec2 posB = b->GetBody()->GetPosition();
@@ -75,6 +76,7 @@ class ContactListener : public b2ContactListener {
             std::remove_if(character->m_collidingWeapons.begin(), character->m_collidingWeapons.end(),
                            [weapon](MeleeWeapon* weapon_ptr) -> bool {
                                weapon_ptr == weapon;
+                               return false;
             });
 		}
 

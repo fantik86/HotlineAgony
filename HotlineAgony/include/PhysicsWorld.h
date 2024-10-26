@@ -5,7 +5,7 @@
 #include <box2d/box2d.h>
 
 struct PhysicsData {
-	const char* name;
+	std::string name;
 	void* owner;
 };
 

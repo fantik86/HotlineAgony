@@ -33,7 +33,7 @@ namespace game {
 
                 Animator::Add(0, anim_idle, [this]() -> bool {return getState() == CharacterState::Idle;});
                 Animator::Add(1, anim_moving, [this]() -> bool {return getState() == CharacterState::Walking;});
-                Animator::Add(2, anim_legs, [this]() -> bool {return moving == true;});
+                Animator::Add(2, anim_legs, [this]() -> bool {return moving;});
                 Animator::Add(3, anim_punching, [this]() -> bool {
                     if ((*holdingWeapon).m_weapon_name == "wp_Fists") {
                         if (Animator::GetAnimationById(3).getAnimationState() == AnimationState::Ended) {
@@ -47,6 +47,7 @@ namespace game {
                             return false;
                         }
                     }
+                    return false;
                 });
                 Animator::Add(4, anim_knife, [this]() -> bool {
                     if ((*holdingWeapon).m_weapon_name == "wp_Knife") {
