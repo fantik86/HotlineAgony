@@ -23,9 +23,8 @@ void initWeapon(MeleeWeapon* weapon) {
 	fixture.density = 50.f;
 	fixture.friction = 1.f;
 	fixture.restitution = 0.5f; // Force of bouncing item off the other hitboxes
-    fixture.isSensor = false;
-    fixture.filter.categoryBits = 0x0002;
-    fixture.filter.maskBits = 0x0008;
+    fixture.filter.categoryBits = COLLISION_WEAPON;
+    fixture.filter.maskBits = COLLISION_WORLD | COLLISION_PLR_OUTER_HITBOX;
 
 
 	b2FixtureUserData userData;
@@ -37,6 +36,7 @@ void initWeapon(MeleeWeapon* weapon) {
 	fixture.userData = userData;
 
 	body->CreateFixture(&fixture);
+
 	weapon->SetPhysicsBody(body);
 }
 

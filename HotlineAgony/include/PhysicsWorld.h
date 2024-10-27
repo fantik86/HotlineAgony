@@ -9,6 +9,13 @@ struct PhysicsData {
 	void* owner;
 };
 
+enum CollisionCategory : uint16 {
+    COLLISION_WORLD = 0x0001,
+    COLLISION_WEAPON = 0x0002,
+    COLLISION_PLR_HITBOX = 0x0004,
+    COLLISION_PLR_OUTER_HITBOX = 0x0008
+};
+
 class PhysicsWorld {
 public:
 	static b2World& GetWorld();

@@ -52,7 +52,6 @@ class ContactListener : public b2ContactListener {
 			MeleeWeapon* weapon = reinterpret_cast<MeleeWeapon*>(dataB->owner);
 			Velocity *= 15;
 			//b->GetBody()->SetLinearVelocity(Velocity);
-			b->GetBody()->SetAngularVelocity(rand() % 2 == 0 ? rand() % 2 + 2 : -(rand() % 2 + 2));
             auto it = std::find(character->m_collidingWeapons.begin(), character->m_collidingWeapons.end(), weapon);
             character->m_collidingWeapons.erase(it);
 		}
@@ -62,10 +61,14 @@ class ContactListener : public b2ContactListener {
 			Velocity *= 15;
 
 			//a->GetBody()->SetLinearVelocity(Velocity);
-			a->GetBody()->SetAngularVelocity(rand() % 2 == 0 ? rand() % 2 + 2 : -(rand() % 2 + 2));
             auto it = std::find(character->m_collidingWeapons.begin(), character->m_collidingWeapons.end(), weapon);
             character->m_collidingWeapons.erase(it);
 		}
-
+        if (nameA == "Player" && nameB == "Weapon") {
+            b->GetBody()->SetAngularVelocity(rand() % 2 == 0 ? rand() % 2 + 2 : -(rand() % 2 + 2));
+        }
+        else if (nameA == "Weapon" && nameB == "Player") {
+            a->GetBody()->SetAngularVelocity(rand() % 2 == 0 ? rand() % 2 + 2 : -(rand() % 2 + 2));
+        }
 	}
 };

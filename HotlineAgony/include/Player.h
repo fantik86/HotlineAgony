@@ -77,7 +77,8 @@ namespace game {
                 plrFixture.shape = &player_shape;
                 plrFixture.density = 1.f;
                 plrFixture.friction = 0.5f;
-                plrFixture.filter.categoryBits = 0x0001; // Player
+                plrFixture.filter.categoryBits = COLLISION_PLR_HITBOX;
+                plrFixture.filter.maskBits = COLLISION_WORLD;
 
                 b2FixtureUserData userData;
                 PhysicsData* metadata = new PhysicsData();
@@ -98,10 +99,11 @@ namespace game {
                 b2FixtureDef collisionFixture;
                 collisionFixture.shape = &collision_shape;
                 collisionFixture.density = 1.f;
-                collisionFixture.friction = 0.5f;
+                collisionFixture.friction = 0.f;
                 collisionFixture.isSensor = true;
-                collisionFixture.filter.categoryBits = 0x0008;
-                collisionFixture.filter.maskBits = 0x0002;
+                collisionFixture.filter.categoryBits = COLLISION_PLR_OUTER_HITBOX;
+                collisionFixture.filter.maskBits = COLLISION_WEAPON;
+
 
                 b2FixtureUserData collisionUserData;
                 PhysicsData* collisionMetadata = new PhysicsData();
@@ -113,6 +115,7 @@ namespace game {
 
                 collision_body = PhysicsWorld::GetWorld().CreateBody(&bodyCollisionDef);
                 collision_body->CreateFixture(&collisionFixture);
+                collision_body->SetSleepingAllowed(false);
             }
 
             void Draw() override;

@@ -106,7 +106,7 @@ void Environment::InitTilemapHitboxes() {
 					wallfixture.shape = &wallshape;
 					wallfixture.density = 1.0f;
 					wallfixture.friction = 0.3f;
-                    wallfixture.filter.categoryBits = 0x0004;
+                    wallfixture.filter.categoryBits = COLLISION_WORLD;
 
 					wallbody->CreateFixture(&wallfixture);
 				}
