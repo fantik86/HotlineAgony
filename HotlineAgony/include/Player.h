@@ -104,7 +104,6 @@ namespace game {
                 collisionFixture.filter.categoryBits = COLLISION_PLR_OUTER_HITBOX;
                 collisionFixture.filter.maskBits = COLLISION_WEAPON;
 
-
                 b2FixtureUserData collisionUserData;
                 PhysicsData* collisionMetadata = new PhysicsData();
                 collisionMetadata->name = "playerCollision";
