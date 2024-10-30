@@ -41,3 +41,4 @@ void wp_Revolver::Drop() {
 void wp_Revolver::Throw() {
 	TraceLog(8, "Throw activated");
 }
+
