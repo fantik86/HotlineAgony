@@ -25,3 +25,19 @@ void wp_Knife::Drop() {
 void wp_Knife::Throw() {
 	TraceLog(8, "Throw activated");
 }
+
+void wp_Revolver::Shoot() {
+	TraceLog(8, "Attack activated");
+}
+
+void wp_Revolver::Reload() {
+	TraceLog(8, "Attack activated");
+}
+
+void wp_Revolver::Drop() {
+	TraceLog(8, "Drop activated");
+}
+
+void wp_Revolver::Throw() {
+	TraceLog(8, "Throw activated");
+}
