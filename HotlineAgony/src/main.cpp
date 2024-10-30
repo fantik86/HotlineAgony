@@ -34,9 +34,9 @@ int main(int argc, char** argv)
 
     std::string game_path = GetApplicationDirectory();
 
-    TexturePool::AddTexture(TexturePoolTextureType::Building, static_cast<int>(TileType::UNKNOWN), std::move(LoadTexture((game_path + "/assets/buildings/unknown.png").c_str())));
-    TexturePool::AddTexture(TexturePoolTextureType::Building, static_cast<int>(TileType::WALL), std::move(LoadTexture((game_path + "/assets/buildings/wall.png").c_str())));
-    TexturePool::AddTexture(TexturePoolTextureType::Building, static_cast<int>(TileType::FLOOR), std::move(LoadTexture((game_path + "/assets/buildings/floor.png").c_str())));
+    TexturePool::AddTexture(TexturePoolTextureType::Building, static_cast<int>(TileType::UNKNOWN), LoadTexture((game_path + "/assets/buildings/unknown.png").c_str()));
+    TexturePool::AddTexture(TexturePoolTextureType::Building, static_cast<int>(TileType::WALL), LoadTexture((game_path + "/assets/buildings/wall.png").c_str()));
+    TexturePool::AddTexture(TexturePoolTextureType::Building, static_cast<int>(TileType::FLOOR), LoadTexture((game_path + "/assets/buildings/floor.png").c_str()));
 
 
     Tilemap tilemap(Vector2{0, 0}, 32, 32);
@@ -56,7 +56,9 @@ int main(int argc, char** argv)
     
     Camera2D default_camera = { 0 };
     default_camera.target = Vector2{ 0, 0 };
-    default_camera.offset = Vector2{ GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
+    default_camera.offset = Vector2{
+        static_cast<float>(GetScreenWidth()) / 2.0f,
+        static_cast<float>(GetScreenHeight()) / 2.0f };
     default_camera.zoom = 1.35f;
     default_camera.rotation = 0;
     
