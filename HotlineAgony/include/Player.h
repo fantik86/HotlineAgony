@@ -27,7 +27,9 @@ namespace game {
                 Animation anim_moving(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/walking"), playerBodyTexture, true, 0.1);
                 Animation anim_legs(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/legs"), playerLegsTexture, true, 0.05);
                 Animation anim_punching(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/punching"), playerBodyTexture, false, 0.04);
-                Animation anim_knife(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/knife"), playerBodyTexture, false, 0.02);
+                Animation anim_knife_attack(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/knife_attack"), playerBodyTexture, false, 0.02);
+                Animation anim_knife_idle(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/knife_idle"), playerBodyTexture, true, 0.01);
+                Animation anim_pistol_idle(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/pistol_idle"), playerBodyTexture, true, 0.01);
 
 
 
@@ -49,7 +51,7 @@ namespace game {
                     }
                     return false;
                 });
-                Animator::Add(4, anim_knife, [this]() -> bool {
+                Animator::Add(4, anim_knife_attack, [this]() -> bool {
                     if ((*holdingWeapon).m_weapon_name == "wp_Knife") {
                         if (Animator::GetAnimationById(4).getAnimationState() == AnimationState::Ended) {
                             setState(CharacterState::Idle);
@@ -64,6 +66,8 @@ namespace game {
                     }
                     return false;
                 });
+                Animator::Add(5, anim_knife_idle, [this]() -> bool {return (*holdingWeapon).m_weapon_name == "wp_Knife"; });
+                Animator::Add(5, anim_pistol_idle, [this]() -> bool {return (*holdingWeapon).m_weapon_name == "wp_Pistol"; });
 
 
                 b2BodyDef bodyPlayerDef;

@@ -97,7 +97,7 @@ int main(int argc, char** argv)
     else
         plr.player_camera.zoom = defaultCameraZoom * 0.7f;
 
-    WeaponHandler::CreateWeapon<wp_Knife>(Vector2{0, 50});
+    WeaponHandler::CreateWeapon<wp_Pistol>(Vector2{0, 50});
 
     //-------------------------------------------------//
     //                    MAIN LOOP                    //

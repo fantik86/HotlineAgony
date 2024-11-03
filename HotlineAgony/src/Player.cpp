@@ -20,13 +20,15 @@ void Player::Draw() {
     float legs_width = static_cast<float>(playerLegsTexture.width);
     float legs_height = static_cast<float>(playerLegsTexture.height);
 
-
+    if (body_width != body_height) {
+        throw std::runtime_error("Player's body width and body height should be in a 1:1 ratio. Check player animation sprites.");
+    }
     float legs_direction = atan2(-walking_direction.y, walking_direction.x) * RAD2DEG;
 
     BeginMode2D(player_camera);
 
-    Environment::DrawTexture(playerLegsTexture, position, Vector2{ 16, 16 }, legs_width, legs_height, character_size, legs_direction);
-    Environment::DrawTexture(playerBodyTexture, position, Vector2{ 16, 16 }, body_width, body_height, character_size, character_direction * RAD2DEG);
+    Environment::DrawTexture(playerLegsTexture, position, Vector2{ legs_width / 2.f, legs_height / 2.f }, legs_width, legs_height, character_size, legs_direction);
+    Environment::DrawTexture(playerBodyTexture, position, Vector2{ body_width / 2.f, body_height / 2.f }, body_width, body_height, Normalize(body_width, 1 / body_width, body_width), character_direction * RAD2DEG);
 
     EndMode2D();
     bool isCameraPressed = IsKeyDown(std::get<KeyboardKey>(controls.camera));

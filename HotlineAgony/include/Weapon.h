@@ -162,9 +162,9 @@ public:
 	void Throw() override;
 };
 
-class wp_Revolver : public RangeWeapon {
+class wp_Pistol : public RangeWeapon {
 public:
-	wp_Revolver() : RangeWeapon("wp_Revolver", LoadTexture(std::string(GetApplicationDirectory()).append("/assets/weapons/wp_Revolver.png").c_str())) {
+	wp_Pistol() : RangeWeapon("wp_Pistol", LoadTexture(std::string(GetApplicationDirectory()).append("/assets/weapons/wp_Pistol.png").c_str())) {
 		m_position = Vector2{ 0, 0 };
 		m_onGround = true;
 		m_canDrop = true;
@@ -172,7 +172,7 @@ public:
 		m_canAttack = true;
 		m_physics_body_size = Vector2{ 7.8f, 2.f };
 	}
-	wp_Revolver(Vector2 position) : RangeWeapon("wp_Revolver", LoadTexture(std::string(GetApplicationDirectory()).append("/assets/weapons/wp_Revolver.png").c_str())) {
+	wp_Pistol(Vector2 position) : RangeWeapon("wp_Pistol", LoadTexture(std::string(GetApplicationDirectory()).append("/assets/weapons/wp_Pistol.png").c_str())) {
 		m_position = position;
 		m_onGround = true;
 		m_canDrop = true;

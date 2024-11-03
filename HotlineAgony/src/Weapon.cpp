@@ -26,19 +26,18 @@ void wp_Knife::Throw() {
 	TraceLog(8, "Throw activated");
 }
 
-void wp_Revolver::Shoot() {
+void wp_Pistol::Shoot() {
 	TraceLog(8, "Attack activated");
 }
 
-void wp_Revolver::Reload() {
+void wp_Pistol::Reload() {
 	TraceLog(8, "Attack activated");
 }
 
-void wp_Revolver::Drop() {
+void wp_Pistol::Drop() {
 	TraceLog(8, "Drop activated");
 }
 
-void wp_Revolver::Throw() {
+void wp_Pistol::Throw() {
 	TraceLog(8, "Throw activated");
 }
-
