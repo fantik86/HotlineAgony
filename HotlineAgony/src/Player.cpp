@@ -7,13 +7,7 @@ using game::global::Environment;
 extern Camera2D worldcam;
 
 void Player::Draw() {
-    Vector2 mouse2world = GetScreenToWorld2D(GetMousePosition(), player_camera);
-
-
-    float character_direction = atan2f(mouse2world.y - position.y,
-        mouse2world.x - position.x); // Dont touch, i dont have idea how this hellish thing works!
-
-    player_camera.target = position;
+    
 
     float body_width = static_cast<float>(playerBodyTexture.width);
     float body_height = static_cast<float>(playerBodyTexture.height);
@@ -28,24 +22,9 @@ void Player::Draw() {
     BeginMode2D(player_camera);
 
     Environment::DrawTexture(playerLegsTexture, position, Vector2{ legs_width / 2.f, legs_height / 2.f }, legs_width, legs_height, character_size, legs_direction);
-    Environment::DrawTexture(playerBodyTexture, position, Vector2{ body_width / 2.f, body_height / 2.f }, body_width, body_height, Normalize(body_width, 1 / body_width, body_width), character_direction * RAD2DEG);
+    Environment::DrawTexture(playerBodyTexture, position, Vector2{ body_width / 2.f, body_height / 2.f }, body_width, body_height, Normalize(body_width, 1 / body_width, body_width), degree_direction);
 
     EndMode2D();
-    bool isCameraPressed = IsKeyDown(std::get<KeyboardKey>(controls.camera));
-
-    Vector2 newCameraPos = Vector2{
-        GetScreenWidth() / 2.0f - camera_info.camera_player_distance * cos(character_direction),
-        GetScreenHeight() / 2.0f - camera_info.camera_player_distance * sin(character_direction) };
-
-    Camera2D temp_camera = player_camera;
-    temp_camera.zoom = camera_info.fly_length; ///< Zoom defines length of camera flight during hold LShift
-
-    if (isCameraPressed) {
-        temp_camera.zoom = 1.f / temp_camera.zoom;
-        newCameraPos = Vector2Subtract(newCameraPos, Vector2Subtract(GetScreenToWorld2D(GetMousePosition(), temp_camera), position));
-    }
-    player_camera.target = position;
-    player_camera.offset = Vector2Lerp(player_camera.offset, newCameraPos, camera_info.speed);
 }
 
 static void switchFullsreen() {
@@ -61,7 +40,46 @@ static void switchFullsreen() {
 }
 
 void Player::updateCamera() {
+    Vector2 mouse2world = GetScreenToWorld2D(GetMousePosition(), player_camera);
 
+
+    degree_direction = atan2f(mouse2world.y - position.y,
+        mouse2world.x - position.x) * RAD2DEG; // Dont touch, i dont have idea how this hellish thing works!
+
+    Vector2 newCameraPos = Vector2{
+        GetScreenWidth() / 2.0f - camera_info.camera_player_distance * cos(degree_direction * DEG2RAD),
+        GetScreenHeight() / 2.0f - camera_info.camera_player_distance * sin(degree_direction * DEG2RAD) };
+
+
+    bool isCameraPressed = IsKeyDown(std::get<KeyboardKey>(controls.camera));
+
+    Camera2D temp_camera = player_camera;
+    temp_camera.zoom = camera_info.fly_length; ///< Zoom defines length of camera flight during hold LShift
+
+    if (isCameraPressed) {
+        temp_camera.zoom = 1.f / temp_camera.zoom;
+        newCameraPos = Vector2Subtract(newCameraPos, Vector2Subtract(GetScreenToWorld2D(GetMousePosition(), temp_camera), position));
+    }
+
+    
+    float mouseWheelMove = GetMouseWheelMove();
+    float zoomStep = 1.f / 3.f;
+    float minZoom = 1.f;
+    float maxZoom = 2.f;
+    float zoomChangeSpeed = 0.4f;
+
+    if (mouseWheelMove > 0) {
+        mouseWheelZoom += zoomStep;
+    }
+    else if (mouseWheelMove < 0) {
+        mouseWheelZoom -= zoomStep;
+    }
+
+    mouseWheelZoom = Clamp(mouseWheelZoom, minZoom, maxZoom);
+
+    player_camera.target = position;
+    player_camera.offset = Vector2Lerp(player_camera.offset, newCameraPos, camera_info.speed);
+    player_camera.zoom = Lerp(player_camera.zoom, mouseWheelZoom * getWindowSizeRatio() * CAMERA_ZOOM_MULTIPLIER, zoomChangeSpeed);
 }
 
 void Player::updateKeyPress() {
@@ -81,22 +99,7 @@ void Player::updateKeyPress() {
     }
 
 
-    float mouseWheelMove = GetMouseWheelMove();
-    float zoomStep = 1.f / 3.f;
-    float minZoom = 1.f;
-    float maxZoom = 2.f;
-    float zoomChangeSpeed = 0.4f;
-    if (mouseWheelMove > 0) {
-        mouseWheelZoom += zoomStep;
-    }
-    else if (mouseWheelMove < 0) {
-        mouseWheelZoom -= zoomStep;
-    }
-
-
-    mouseWheelZoom = Clamp(mouseWheelZoom, minZoom, maxZoom);
-    player_camera.zoom = Lerp(player_camera.zoom, mouseWheelZoom * getWindowSizeRatio() * CAMERA_ZOOM_MULTIPLIER, zoomChangeSpeed);
-
+    
     // Player movement
     if (canControl) {
         bool isLeftPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_left));
@@ -239,9 +242,6 @@ void Player::updateState() {
         setState(CharacterState::Attacking);
     }
 
-
-
-
     if (state != CharacterState::Attacking) {
         if (isLeftPressed && isRightPressed) {
             if (isUpPressed || isDownPressed) {
@@ -272,6 +272,7 @@ void Player::updatePlayer() {
     position.x = physics_body->GetPosition().x;
     position.y = physics_body->GetPosition().y;
     updateState();
+    updateCamera();
     updateKeyPress();
     Draw();
 }

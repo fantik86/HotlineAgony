@@ -40,6 +40,7 @@ namespace game {
             void setWalkingDirection(Vector2 new_walking_direction);
             void setWalkingDirectionX(float new_X);
             void setWalkingDirectionY(float new_Y);
+            float degree_direction = 0;
             Vector2 walking_direction = { 0, 0 };
             float character_size = 0.95f;
             MeleeWeapon* holdingWeapon = WeaponHandler::CreateWeapon<wp_Fists>(Vector2{ FLT_MAX, FLT_MAX }); ///< Fists as default player weapon.
