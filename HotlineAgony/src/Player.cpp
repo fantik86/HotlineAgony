@@ -237,30 +237,20 @@ void Player::updateState() {
     bool isDownPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_down));
     bool isAttackPressed = IsMouseButtonDown(std::get<MouseButton>(controls.attack));
 
-
     if (isAttackPressed) {
         setState(CharacterState::Attacking);
     }
 
     if (state != CharacterState::Attacking) {
-        if (isLeftPressed && isRightPressed) {
-            if (isUpPressed || isDownPressed) {
+        if (isLeftPressed || isRightPressed || 
+            isUpPressed || isDownPressed) {
+            if (isLeftPressed && !isRightPressed ||
+                isRightPressed && !isLeftPressed)
                 setState(CharacterState::Walking);
-            }
-            else {
-                setState(CharacterState::Idle);
-            }
-        }
-        else if (isUpPressed && isDownPressed) {
-            if (isLeftPressed || isRightPressed) {
+            
+            if (isUpPressed && !isDownPressed ||
+                isDownPressed && !isUpPressed)
                 setState(CharacterState::Walking);
-            }
-            else {
-                setState(CharacterState::Idle);
-            }
-        }
-        else if (isLeftPressed || isRightPressed || isUpPressed || isDownPressed) {
-            setState(CharacterState::Walking);
         }
         else {
             setState(CharacterState::Idle);
