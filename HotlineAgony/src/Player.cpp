@@ -48,28 +48,44 @@ void Player::Draw() {
     player_camera.offset = Vector2Lerp(player_camera.offset, newCameraPos, camera_info.speed);
 }
 
-void Player::updateKeyPress() {
-    // Fullscreen switching
-    if (IsKeyPressed(KEY_F11) || (IsKeyDown(KEY_LEFT_ALT) && IsKeyPressed(KEY_ENTER))) {
-        int currentMonitor = GetCurrentMonitor();
-        if (IsWindowFullscreen()) {
-            SetWindowSize(800, 600);
-        }
-        else {
-            SetWindowSize(GetMonitorWidth(currentMonitor), GetMonitorHeight(currentMonitor));
-        }
-        ToggleFullscreen();
+static void switchFullsreen() {
+    int currentMonitor = GetCurrentMonitor();
+    if (IsWindowFullscreen()) {
+        SetWindowSize(800, 600);
+    }
+    else {
+        SetWindowSize(GetMonitorWidth(currentMonitor), GetMonitorHeight(currentMonitor));
+    }
+    ToggleFullscreen();
 
-        // This is need to prevent camera easing to player from down-right corner upon changing fullscreen
+}
+
+void Player::updateCamera() {
+
+}
+
+void Player::updateKeyPress() {
+
+    if (IsKeyPressed(KEY_F11) || (IsKeyDown(KEY_LEFT_ALT) && IsKeyPressed(KEY_ENTER))) {
+        switchFullsreen();
+
+        /*
+        * Line below is need to prevent camera easing to player
+        * from down-right corner upon changing fullscreen
+        */
         player_camera.offset = Vector2{ GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
     }
+
     if (IsKeyPressed(KEY_F2)) {
-        Environment::debug_draw_edges = !Environment::debug_draw_edges;
+        Environment::switchShowHitboxes();
     }
 
 
     float mouseWheelMove = GetMouseWheelMove();
     float zoomStep = 1.f / 3.f;
+    float minZoom = 1.f;
+    float maxZoom = 2.f;
+    float zoomChangeSpeed = 0.4f;
     if (mouseWheelMove > 0) {
         mouseWheelZoom += zoomStep;
     }
@@ -77,11 +93,9 @@ void Player::updateKeyPress() {
         mouseWheelZoom -= zoomStep;
     }
 
-    float defaultCameraZoom = (float)GetScreenWidth() / (float)GetScreenHeight() * 2.f * 0.7f;
 
-    mouseWheelZoom = Clamp(mouseWheelZoom, 1, 2);
-    //player_camera.zoom = Clamp(mouseWheelZoom * defaultCameraZoom, defaultCameraZoom, 10);
-    player_camera.zoom = Lerp(player_camera.zoom, mouseWheelZoom * defaultCameraZoom, 0.4);
+    mouseWheelZoom = Clamp(mouseWheelZoom, minZoom, maxZoom);
+    player_camera.zoom = Lerp(player_camera.zoom, mouseWheelZoom * getWindowSizeRatio() * CAMERA_ZOOM_MULTIPLIER, zoomChangeSpeed);
 
     // Player movement
     if (canControl) {

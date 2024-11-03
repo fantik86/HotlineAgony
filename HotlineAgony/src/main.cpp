@@ -90,12 +90,12 @@ int main(int argc, char** argv)
     
     PhysicsWorld::GetWorld().SetDebugDraw(&drawer);
 
-    float defaultCameraZoom = (float)GetScreenWidth() / (float)GetScreenHeight() * 2.f;
+    float defaultCameraZoom = getWindowSizeRatio();
 
     if (IsWindowFullscreen()) // Can ruin any attempts to change zoom in other place
         plr.player_camera.zoom = defaultCameraZoom;
     else
-        plr.player_camera.zoom = defaultCameraZoom * 0.7f;
+        plr.player_camera.zoom = defaultCameraZoom;
 
     WeaponHandler::CreateWeapon<wp_Pistol>(Vector2{0, 50});
 
@@ -131,7 +131,7 @@ int main(int argc, char** argv)
 
         BeginMode2D(worldcam);
         
-        if (Environment::debug_draw_edges) {
+        if (Environment::isHitboxesShowing()) {
             Environment::DrawHitboxes();
         }
 

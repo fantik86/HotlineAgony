@@ -34,3 +34,4 @@ animation_sequence_t packAnimationSequence(const std::string dirpath) {
 
     return packed_textures;
 }
+

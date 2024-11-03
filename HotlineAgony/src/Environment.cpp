@@ -10,7 +10,7 @@ using game::global::TexturePool;
 using game::drawing::Tilemap;
 
 Tilemap* Environment::m_tilemap = nullptr;
-bool Environment::debug_draw_edges = false;
+bool Environment::m_showHitboxes = false;
 float Environment::tilemap_size_multiplier = 0.5f;
 
 void Environment::SetTilemap(Tilemap& tilemap) {
@@ -198,4 +198,12 @@ void Environment::DrawHitboxes() {
 
 inline void Environment::GameUpdate() {
 	// TODO: write code here
+}
+
+void Environment::switchShowHitboxes() {
+	m_showHitboxes = !m_showHitboxes;
+}
+
+bool Environment::isHitboxesShowing() {
+	return m_showHitboxes;
 }

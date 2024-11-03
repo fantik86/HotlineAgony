@@ -26,11 +26,13 @@ namespace game {
 			static void DrawTexture(Texture2D texture, Vector2 position, Vector2 origin, float width, float height, float rotation);
 			static void DrawHitboxes();
 			static void InitTilemapHitboxes();
-			static bool debug_draw_edges;
+			static void switchShowHitboxes();
+			static bool isHitboxesShowing();
 		private:
 			static Tilemap* m_tilemap;
 			static float tilemap_size_multiplier;
-			float dayTime = 0.0f; ///< Current day time. 0 for the 0:00 and 1 for the 23:59
+			static float dayTime; ///< Current day time. 0 for the 0:00 and 1 for the 23:59
+			static bool m_showHitboxes;
 		};
 	}
 }

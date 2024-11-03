@@ -125,6 +125,7 @@ namespace game {
             void updateKeyPress(); // TODO: move "Move()" to Character class and make it virtual
             void updateState();
             void updatePlayer();
+            void updateCamera();
             void setCamera(Camera2D& camera);
             playercontrols_t controls;
             Camera2D& player_camera;

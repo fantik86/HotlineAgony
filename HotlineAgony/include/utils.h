@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <memory>
 #include <array>
-#include "raylib.h"
+#include <raylib.h>
 #include "options.h"
 
 /** \file utils.h
@@ -86,6 +86,10 @@ typedef playercontrols_t playercontrols_t;
 */
 animation_sequence_t packAnimationSequence(const std::string dirpath);
 
+
+inline float getWindowSizeRatio() {
+    return (float)GetScreenWidth() / (float)GetScreenHeight();
+}
 
 enum class TexturePoolTextureType {
     Building, AnimationFrame
