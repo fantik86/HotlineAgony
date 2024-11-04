@@ -68,10 +68,6 @@ CharacterState Character::getState() const {
 }
 
 void Character::setState(CharacterState new_state) {
-	if (state == new_state) {
-		return;
-	}
-	
 	state = new_state;
 }
 

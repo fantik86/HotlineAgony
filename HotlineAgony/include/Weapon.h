@@ -122,6 +122,7 @@ public:
 	}
 
 	std::string m_weapon_name;
+	int ammoCount = 8;
 	Vector2 m_physics_body_size = Vector2{ 12.f, 5.f };
 	Vector2 m_physics_body_align_center = Vector2{ 6.f, 5.f };
 };

@@ -113,9 +113,7 @@ enum class CharacterState { // TODO: L10
 */
 enum class AnimationState {
     Playing,         ///< Animation is playing right now or resumed.
-    Stopped,         ///< Animation is stopped by \ref Animator::Stop()
     Ended,           ///< Animation isn't looped and played till the last frame.
-    Playable         ///< Animation can be played, but not playing.
 };
 
 /**

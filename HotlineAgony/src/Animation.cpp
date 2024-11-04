@@ -9,7 +9,7 @@ Animation::Animation(animation_sequence_t frame_sequence, Texture2D& texture, bo
 	m_next_frame_time(GetTime() + frame_delay), 
 	m_current_frame(0), 
 	m_looped(isLooped), 
-	m_animation_state(AnimationState::Playing) {}
+	m_animation_state(AnimationState::Ended) {}
 
 
 /// Updates texture of the Animation.
@@ -39,6 +39,10 @@ void Animation::UpdateFrame() {
 
 AnimationState Animation::getAnimationState() const {
 	return m_animation_state;
+}
+
+const Texture2D& Animation::getAnimatingTextureRef() const {
+	return m_current_texture;
 }
 
 void Animation::setAnimationState(AnimationState new_state) {

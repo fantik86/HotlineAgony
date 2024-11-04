@@ -22,7 +22,7 @@ namespace game {
         class Player : public Character {
         public:
             Player(Camera2D& camera) : Character(100.f), player_camera(camera) {
-
+                
                 Animation anim_idle(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/idle"), playerBodyTexture, true, 0.01);
                 Animation anim_moving(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/walking"), playerBodyTexture, true, 0.1);
                 Animation anim_legs(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/legs"), playerLegsTexture, true, 0.05);
@@ -31,44 +31,8 @@ namespace game {
                 Animation anim_knife_idle(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/knife_idle"), playerBodyTexture, true, 0.01);
                 Animation anim_pistol_idle(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/pistol_idle"), playerBodyTexture, true, 0.01);
 
-
-
-                Animator::Add(0, anim_idle, [this]() -> bool {return getState() == CharacterState::Idle;});
-                Animator::Add(1, anim_moving, [this]() -> bool {return getState() == CharacterState::Walking;});
-                Animator::Add(2, anim_legs, [this]() -> bool {return moving;});
-                Animator::Add(3, anim_punching, [this]() -> bool {
-                    if ((*holdingWeapon).m_weapon_name == "wp_Fists") {
-                        if (Animator::GetAnimationById(3).getAnimationState() == AnimationState::Ended) {
-                            setState(CharacterState::Idle);
-                            Animator::GetAnimationById(3).setAnimationState(AnimationState::Playing);
-                        }
-                        if (getState() == CharacterState::Attacking) {
-                            return true;
-                        }
-                        else {
-                            return false;
-                        }
-                    }
-                    return false;
-                });
-                Animator::Add(4, anim_knife_attack, [this]() -> bool {
-                    if ((*holdingWeapon).m_weapon_name == "wp_Knife") {
-                        if (Animator::GetAnimationById(4).getAnimationState() == AnimationState::Ended) {
-                            setState(CharacterState::Idle);
-                            Animator::GetAnimationById(4).setAnimationState(AnimationState::Playing);
-                        }
-                        if (getState() == CharacterState::Attacking) {
-                            return true;
-                        }
-                        else {
-                            return false;
-                        }
-                    }
-                    return false;
-                });
-                Animator::Add(5, anim_knife_idle, [this]() -> bool {return (*holdingWeapon).m_weapon_name == "wp_Knife"; });
-                Animator::Add(5, anim_pistol_idle, [this]() -> bool {return (*holdingWeapon).m_weapon_name == "wp_Pistol"; });
-
+                Animator::Add(0, anim_idle, 0);
+                Animator::Add(1, anim_moving, 1);
 
                 b2BodyDef bodyPlayerDef;
                 bodyPlayerDef.type = b2_dynamicBody;

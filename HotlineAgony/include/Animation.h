@@ -10,7 +10,9 @@ namespace game {
             Animation(animation_sequence_t frame_sequence, Texture2D& texture, bool isLooped, double frame_delay);
             void UpdateFrame();
             AnimationState getAnimationState() const;
+            const Texture2D& getAnimatingTextureRef() const;
             void setAnimationState(AnimationState new_state);
+
             bool operator==(const Animation& b) const {
                 if (m_current_frame == b.m_current_frame && m_frame_sequence.size() == b.m_frame_sequence.size()
                     && m_current_texture.id == b.m_current_texture.id && m_next_frame_time == b.m_next_frame_time
@@ -36,6 +38,7 @@ namespace game {
             double m_next_frame_time;
             double m_frame_delay;
             bool m_looped = true;
+            
         };
     }
 }

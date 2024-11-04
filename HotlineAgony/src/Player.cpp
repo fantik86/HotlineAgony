@@ -14,10 +14,10 @@ void Player::Draw() {
     float legs_width = static_cast<float>(playerLegsTexture.width);
     float legs_height = static_cast<float>(playerLegsTexture.height);
 
-    
     if (body_width != body_height) {
         throw std::runtime_error("Player's body width and body height should be in a 1:1 ratio. Check player animation sprites.");
     }
+
     float legs_direction = atan2(-walking_direction.y, walking_direction.x) * RAD2DEG;
 
     BeginMode2D(player_camera);
@@ -238,19 +238,26 @@ void Player::updateState() {
         if (isLeftPressed || isRightPressed || 
             isUpPressed || isDownPressed) {
             if (isLeftPressed && !isRightPressed ||
-                isRightPressed && !isLeftPressed)
+                isRightPressed && !isLeftPressed) {
                 setState(CharacterState::Walking);
+                Animator::Play(1);
+            }
             
             if (isUpPressed && !isDownPressed ||
-                isDownPressed && !isUpPressed)
+                isDownPressed && !isUpPressed) {
                 setState(CharacterState::Walking);
+                Animator::Play(1);
+            }
 
             if (isLeftPressed && isRightPressed ||
-                isUpPressed && isDownPressed)
+                isUpPressed && isDownPressed) {
                 setState(CharacterState::Idle);
+                Animator::Play(0);
+            }
         }
         else {
             setState(CharacterState::Idle);
+            Animator::Play(0);
         }
     }
 }
