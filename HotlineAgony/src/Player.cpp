@@ -130,13 +130,10 @@ void Player::updateKeyPress() {
 
                     holdingWeapon->GetPhysicsBody()->SetLinearVelocity(dropVelocity);
                     holdingWeapon = new wp_Fists();
+                    dropTime = -1.0;
                 }
             }
         }
-        else {
-            dropTime = -1.0;
-        }
-        
         if (IsMouseButtonReleased(std::get<MouseButton>(controls.item_throw))) {
             if (holdingWeapon->m_weapon_name != "wp_Fists") {
                 if (!justPickedUpWeapon) {
@@ -149,7 +146,7 @@ void Player::updateKeyPress() {
                 holdingWeapon->SetPhysicsBodyPosition(b2Vec2(position.x, position.y));
                 holdingWeapon->GetPhysicsBody()->SetAngularVelocity(random_rotate == 1 ? 2 : -2);
 
-                float dropLength = 1600.f;
+                float dropLength = 1600.f * Clamp(abs(1 - (dropTime - GetTime())), 0.1f, 1.f);
 
                 Vector2 mouse2world = GetScreenToWorld2D(GetMousePosition(), player_camera);
 
@@ -165,6 +162,9 @@ void Player::updateKeyPress() {
                 holdingWeapon->GetPhysicsBody()->ApplyAngularImpulse(100000, true);
                 holdingWeapon = new wp_Fists();
             }
+        }
+        if (IsMouseButtonUp(std::get<MouseButton>(controls.item_throw))) {
+            dropTime = -1.0;
         }
 
         if (IsMouseButtonPressed(std::get<MouseButton>(controls.item_throw))) {

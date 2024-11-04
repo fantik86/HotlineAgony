@@ -170,7 +170,7 @@ public:
 		m_canDrop = true;
 		m_attackCooldown = 1.f;
 		m_canAttack = true;
-		m_physics_body_size = Vector2{ 7.8f, 2.f };
+		m_physics_body_size = Vector2{ 7.f, 3.f };
 	}
 	wp_Pistol(Vector2 position) : RangeWeapon("wp_Pistol", LoadTexture(std::string(GetApplicationDirectory()).append("/assets/weapons/wp_Pistol.png").c_str())) {
 		m_position = position;
@@ -178,7 +178,7 @@ public:
 		m_canDrop = true;
 		m_attackCooldown = 1.f;
 		m_canAttack = true;
-		m_physics_body_size = Vector2{ 7.8f, 2.f };
+		m_physics_body_size = Vector2{ 7.f, 3.f };
 	}
 	void Shoot() override;
 	void Reload() override;
