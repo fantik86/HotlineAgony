@@ -14,6 +14,7 @@ void Player::Draw() {
     float legs_width = static_cast<float>(playerLegsTexture.width);
     float legs_height = static_cast<float>(playerLegsTexture.height);
 
+    
     if (body_width != body_height) {
         throw std::runtime_error("Player's body width and body height should be in a 1:1 ratio. Check player animation sprites.");
     }
@@ -22,6 +23,7 @@ void Player::Draw() {
     BeginMode2D(player_camera);
 
     Environment::DrawTexture(playerLegsTexture, position, Vector2{ legs_width / 2.f, legs_height / 2.f }, legs_width, legs_height, character_size, legs_direction);
+
     Environment::DrawTexture(playerBodyTexture, position, Vector2{ body_width / 2.f, body_height / 2.f }, body_width, body_height, Normalize(body_width, 1 / body_width, body_width), degree_direction);
 
     EndMode2D();
@@ -83,7 +85,7 @@ void Player::updateCamera() {
 }
 
 void Player::updateKeyPress() {
-
+    
     if (IsKeyPressed(KEY_F11) || (IsKeyDown(KEY_LEFT_ALT) && IsKeyPressed(KEY_ENTER))) {
         switchFullsreen();
 
@@ -133,7 +135,6 @@ void Player::updateKeyPress() {
         }
         else {
             dropTime = -1.0;
-
         }
         
         if (IsMouseButtonReleased(std::get<MouseButton>(controls.item_throw))) {
@@ -176,54 +177,46 @@ void Player::updateKeyPress() {
             }
         }
 
-        if (isLeftPressed && !isRightPressed) {
-            player_camera.offset.x = Lerp(player_camera.offset.x, player_camera.offset.x - 50, 0.05f);
-            worldcam.rotation = Lerp(worldcam.rotation, 1, 0.05f);
-            velocity.x -= walkspeed;
-            setWalkingDirectionX(-1.0f);
-            moving = true;
-        }
-        if (isRightPressed && !isLeftPressed) {
-            player_camera.offset.x = Lerp(player_camera.offset.x, player_camera.offset.x + 50, 0.05f);
-            worldcam.rotation = Lerp(worldcam.rotation, -1, 0.05f);
-            velocity.x += walkspeed;
-            setWalkingDirectionX(1.0f);
-            moving = true;
-        }
-        if (isUpPressed && !isDownPressed) {
-            player_camera.offset.y = Lerp(player_camera.offset.y, player_camera.offset.y + 50, 0.05f);
+        int rotationLerpTarget = 0;
+
+        if (isUpPressed) {
+            setWalkingDirectionY(1.f);
             velocity.y -= walkspeed;
-            setWalkingDirectionY(1.0f);
-            moving = true;
         }
-        if (isDownPressed && !isUpPressed) {
-            player_camera.offset.y = Lerp(player_camera.offset.y, player_camera.offset.y - 50, 0.05f);
+        if (isDownPressed) {
+            setWalkingDirectionY(-1.f);
             velocity.y += walkspeed;
-            setWalkingDirectionY(-1.0f);
-            moving = true;
+        }
+        if (isRightPressed) {
+            setWalkingDirectionX(1.f);
+            rotationLerpTarget -= 1;
+            velocity.x += walkspeed;
+        }
+        if (isLeftPressed) {
+            setWalkingDirectionX(-1.f);
+            rotationLerpTarget += 1;
+            velocity.x -= walkspeed;
         }
 
-        if (!isLeftPressed && !isRightPressed && !isUpPressed && !isDownPressed) {
-            worldcam.rotation = Lerp(worldcam.rotation, 0, 0.05f);
+        if (isRightPressed && isLeftPressed)
+            setWalkingDirectionX(0.f);
+        if (isUpPressed && isDownPressed)
+            setWalkingDirectionY(0.f);
+
+        if (!isRightPressed && !isLeftPressed)
+            setWalkingDirectionX(0.f);
+        if (!isUpPressed && !isDownPressed)
+            setWalkingDirectionY(0.f);
+
+
+        if (walking_direction != Vector2Zero()) {
+            moving = true;
+        }
+        else {
             moving = false;
         }
 
-        if (!isUpPressed && !isDownPressed && (isRightPressed || isLeftPressed)) {
-            setWalkingDirectionY(0.0f);
-        }
-
-        if (isUpPressed && isDownPressed) {
-            setWalkingDirectionY(0.0f);
-        }
-
-        if (!isLeftPressed && !isRightPressed && (isUpPressed || isDownPressed)) {
-            worldcam.rotation = Lerp(worldcam.rotation, 0, 0.05f);
-            setWalkingDirectionX(0.0f);
-        }
-
-        if (isLeftPressed && isRightPressed) {
-            setWalkingDirectionX(0.0f);
-        }
+        worldcam.rotation = Lerp(worldcam.rotation, rotationLerpTarget, 0.05f);
 
         physics_body->SetLinearVelocity(velocity);
         collision_body->SetTransform(physics_body->GetPosition(), 0.f);
@@ -251,6 +244,10 @@ void Player::updateState() {
             if (isUpPressed && !isDownPressed ||
                 isDownPressed && !isUpPressed)
                 setState(CharacterState::Walking);
+
+            if (isLeftPressed && isRightPressed ||
+                isUpPressed && isDownPressed)
+                setState(CharacterState::Idle);
         }
         else {
             setState(CharacterState::Idle);
