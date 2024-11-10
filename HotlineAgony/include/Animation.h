@@ -13,10 +13,24 @@ namespace game {
             const Texture2D& getAnimatingTextureRef() const;
             void setAnimationState(AnimationState new_state);
 
+            bool operator!=(const Animation& b) const {
+                if (m_current_frame != b.m_current_frame ||
+                    m_frame_sequence.size() != b.m_frame_sequence.size() ||
+                    &m_current_texture != &b.m_current_texture ||
+                    m_next_frame_time != b.m_next_frame_time ||
+                    m_frame_delay != b.m_frame_delay ||
+                    m_looped != b.m_looped) {
+                    return true;
+                }
+                return false;
+            }
             bool operator==(const Animation& b) const {
-                if (m_current_frame == b.m_current_frame && m_frame_sequence.size() == b.m_frame_sequence.size()
-                    && m_current_texture.id == b.m_current_texture.id && m_next_frame_time == b.m_next_frame_time
-                    && m_frame_delay == b.m_frame_delay && m_looped == b.m_looped) {
+                if (m_current_frame == b.m_current_frame && 
+                    m_frame_sequence.size() == b.m_frame_sequence.size() && 
+                    &m_current_texture == &b.m_current_texture && 
+                    m_next_frame_time == b.m_next_frame_time &&
+                    m_frame_delay == b.m_frame_delay &&
+                    m_looped == b.m_looped) {
                     return true;
                 }
                 return false;
