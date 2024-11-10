@@ -14,8 +14,11 @@ Animation::Animation(animation_sequence_t frame_sequence, Texture2D& texture, bo
 
 /// Updates texture of the Animation.
 void Animation::UpdateFrame() {
-	
-	if (m_animation_state == AnimationState::Playing) {
+	switch (m_animation_state) {
+	case AnimationState::Pause:
+		return;
+		break;
+	case AnimationState::Playing:
 		if (GetTime() >= m_next_frame_time) {
 			if (m_current_frame == m_frame_sequence.size()) { // if current frame is the last frame
 				if (m_looped) {
@@ -34,6 +37,7 @@ void Animation::UpdateFrame() {
 			m_animation_state = AnimationState::Playing;
 			return;
 		}
+		break;
 	}
 }
 
@@ -46,5 +50,8 @@ const Texture2D& Animation::getAnimatingTextureRef() const {
 }
 
 void Animation::setAnimationState(AnimationState new_state) {
+	if (new_state == AnimationState::Ended) { // I'm not sure that this if statement is really need here
+		m_current_frame = 0;
+	}
 	m_animation_state = new_state;
 }
