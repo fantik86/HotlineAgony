@@ -3,57 +3,79 @@
 #include <algorithm>
 
 
-std::vector<std::tuple<int, game::drawing::Animation, int>> Animator::TaskBuffer = { };
+std::vector<std::pair<int, game::drawing::Animation>> Animator::TaskBuffer = { };
 
 ///< Deleting animation from TaskBuffer
 void Animator::Stop(int id) {
 	for (auto& element : TaskBuffer) {
-		if (std::get<0>(element) == id) {
-			if (std::get<1>(element).getAnimationState() != AnimationState::Ended) {
-				std::get<1>(element).setAnimationState(AnimationState::Ended);
+		if (element.first == id) {
+			if (element.second.getAnimationState() != AnimationState::Ended) {
+				element.second.setAnimationState(AnimationState::Ended);
+				return;
 			}
 		}
 	}
 }
 
-void Animator::Add(int id, game::drawing::Animation& animation, int priority) {
-	TaskBuffer.push_back(std::make_tuple(id, std::move(animation), priority));
-	std::sort(TaskBuffer.begin(), TaskBuffer.end(),
-		[](const std::tuple<int, game::drawing::Animation, int>& lhs, const std::tuple<int, game::drawing::Animation, int>& rhs) {
-			return std::get<2>(lhs) < std::get<2>(rhs);
+void Animator::Add(int id, game::drawing::Animation& animation) {
+	auto it = std::find_if(TaskBuffer.begin(), TaskBuffer.end(), [&animation](const std::pair<int, game::drawing::Animation>& value) {
+		return &animation == &(value.second);
 		});
+
+	if (it != TaskBuffer.end()) { // If animation is found
+		throw std::runtime_error("Can't add existing animation to the Animator.");
+	}
+
+	TaskBuffer.push_back(std::make_pair(id, std::move(animation)));
 }
 
+
 void Animator::Update() {
-	for (auto& element : TaskBuffer) {
-		const Texture2D& current_texture = std::get<1>(element).getAnimatingTextureRef();
+	std::vector<std::reference_wrapper<std::pair<int, game::drawing::Animation>>> filteredAnims;
 
-		std::vector<std::tuple<int, game::drawing::Animation, int>> tempBuf; // buffer for animations with same textures but different priorities
+	std::copy_if(TaskBuffer.begin(), TaskBuffer.end(), std::back_inserter(filteredAnims), [](const std::reference_wrapper<std::pair<int, game::drawing::Animation>>& value) {
+		return value.get().second.getAnimationState() == AnimationState::Playing;
+		}); // copying only playing anims
 
-		std::copy_if(TaskBuffer.begin(), TaskBuffer.end(), std::back_inserter(tempBuf), [&current_texture](std::tuple<int, game::drawing::Animation, int> value) {
-			return &std::get<1>(value).getAnimatingTextureRef() == &current_texture;
-			});
-		auto it = std::max_element(tempBuf.begin(), tempBuf.end(), [](const std::tuple<int, game::drawing::Animation, int>& a, const std::tuple<int, game::drawing::Animation, int>& b) {
-			return std::get<2>(a) < std::get<2>(b);
-			});
-		
-		std::get<1>(*it).UpdateFrame();
+	for (auto& anim : filteredAnims) {
+		std::get<1>(anim.get()).UpdateFrame();
 	}
-	
 }
 
 void Animator::Play(int id) {
-	for (auto& element : TaskBuffer) {
-		if (std::get<0>(element) == id) {
-			std::get<1>(element).setAnimationState(AnimationState::Playing);
+
+	Animation& anim = GetAnimationById(id);
+	
+	// This vector stores animations with the same texture ref as the anim variable
+	std::vector<std::reference_wrapper<std::pair<int, game::drawing::Animation>>> playingAnims;
+
+	std::copy_if(TaskBuffer.begin(), TaskBuffer.end(), std::back_inserter(playingAnims), [&anim](const std::pair<int, game::drawing::Animation>& value) {
+		if (value.second != anim) {
+			return &(value.second).getAnimatingTextureRef() == &anim.getAnimatingTextureRef();
 		}
+		});
+
+	for (auto& animation : playingAnims) {
+		std::get<1>(animation.get()).setAnimationState(AnimationState::Ended);
 	}
+
+	anim.setAnimationState(AnimationState::Playing);
+}
+
+void Animator::Pause(int id) {
+	auto it = std::find_if(TaskBuffer.begin(), TaskBuffer.end(), [id](const std::pair<int, game::drawing::Animation>& value) {
+		return value.first == id;
+		});
+
+	if (it != TaskBuffer.end())
+		(*it).second.setAnimationState(AnimationState::Pause);
 }
 
 Animation& Animator::GetAnimationById(int id) {
-	for (auto& element : TaskBuffer) {
-		if (std::get<0>(element) == id) {
-			return std::get<1>(element);
-		}
-	}
+	auto it = std::find_if(TaskBuffer.begin(), TaskBuffer.end(), [id](const std::pair<int, game::drawing::Animation>& value) {
+		return value.first == id;
+		});
+
+	if (it != TaskBuffer.end())
+		return (*it).second;
 }
