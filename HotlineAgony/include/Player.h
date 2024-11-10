@@ -31,9 +31,15 @@ namespace game {
                 Animation anim_knife_idle(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/knife_idle"), playerBodyTexture, true, 0.01);
                 Animation anim_pistol_idle(packAnimationSequence(std::string(GetApplicationDirectory()) + "/assets/character_appearance/0/pistol_idle"), playerBodyTexture, true, 0.01);
 
-                Animator::Add(0, anim_idle, 0);
-                Animator::Add(1, anim_moving, 1);
-
+                Animator::Add(0, anim_idle);
+                Animator::Add(1, anim_moving);
+                Animator::Add(2, anim_legs);
+                Animator::Add(3, anim_punching);
+                Animator::Add(4, anim_knife_attack);
+                Animator::Add(5, anim_knife_idle);
+                Animator::Add(6, anim_pistol_idle);
+                Animator::Play(0);
+                Animator::Play(2);
                 b2BodyDef bodyPlayerDef;
                 bodyPlayerDef.type = b2_dynamicBody;
                 physics_body = PhysicsWorld::GetWorld().CreateBody(&bodyPlayerDef);

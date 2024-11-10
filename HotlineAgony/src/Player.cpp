@@ -19,7 +19,7 @@ void Player::Draw() {
     }
 
     float legs_direction = atan2(-walking_direction.y, walking_direction.x) * RAD2DEG;
-
+    
     BeginMode2D(player_camera);
 
     Environment::DrawTexture(playerLegsTexture, position, Vector2{ legs_width / 2.f, legs_height / 2.f }, legs_width, legs_height, character_size, legs_direction);
@@ -232,6 +232,14 @@ void Player::updateState() {
 
     if (isAttackPressed) {
         setState(CharacterState::Attacking);
+        Animator::Play(3);
+        Animator::Stop(0);
+        Animator::Stop(1);
+
+    }
+
+    if (Animator::GetAnimationById(3).getAnimationState() == AnimationState::Ended) {
+        setState(CharacterState::Idle);
     }
 
     if (state != CharacterState::Attacking) {
@@ -241,23 +249,31 @@ void Player::updateState() {
                 isRightPressed && !isLeftPressed) {
                 setState(CharacterState::Walking);
                 Animator::Play(1);
+                Animator::Play(2);
+                return;
             }
             
             if (isUpPressed && !isDownPressed ||
                 isDownPressed && !isUpPressed) {
                 setState(CharacterState::Walking);
                 Animator::Play(1);
+                Animator::Play(2);
+                return;
             }
 
             if (isLeftPressed && isRightPressed ||
                 isUpPressed && isDownPressed) {
                 setState(CharacterState::Idle);
+                Animator::Stop(2);
                 Animator::Play(0);
+                return;
             }
         }
         else {
             setState(CharacterState::Idle);
+            Animator::Stop(2);
             Animator::Play(0);
+            return;
         }
     }
 }
