@@ -114,6 +114,7 @@ enum class CharacterState { // TODO: L10
 enum class AnimationState {
     Playing,         ///< Animation is playing right now or resumed.
     Ended,           ///< Animation isn't looped and played till the last frame.
+    Pause            ///< Animation staying in the same frame and doesn't playing.
 };
 
 /**
