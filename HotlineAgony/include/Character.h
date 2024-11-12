@@ -43,6 +43,7 @@ namespace game {
             float degree_direction = 0;
             Vector2 walking_direction = { 0, 0 };
             float character_size = 0.95f;
+            double attackCooldown = 0.0;
             MeleeWeapon* holdingWeapon = WeaponHandler::CreateWeapon<wp_Fists>(Vector2{ FLT_MAX, FLT_MAX }); ///< Fists as default player weapon.
             bool flipAttack = false;
             int walkspeed = 120;                ///< Character speed.

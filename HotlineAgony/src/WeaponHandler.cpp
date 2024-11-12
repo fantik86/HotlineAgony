@@ -6,73 +6,33 @@ std::vector<MeleeWeapon*> WeaponHandler::m_Weapons = { };
 std::vector<RangeWeapon*> WeaponHandler::m_RangeWeapons = { };
 
 static void initWeapon(MeleeWeapon* weapon) {
-	b2BodyDef bodyDef;
-	bodyDef.linearDamping = 5.f;
-	bodyDef.angularDamping = 5.f;
-	bodyDef.type = b2_dynamicBody;
-	bodyDef.position.Set(
-		weapon->GetPosition().x,
-		weapon->GetPosition().y);
-	b2Body* body = PhysicsWorld::GetWorld().CreateBody(&bodyDef);
 
 	b2PolygonShape shape;
 	shape.SetAsBox(weapon->m_physics_body_size.x, weapon->m_physics_body_size.y);
-	
-	
-	b2FixtureDef fixture;
-	fixture.shape = &shape;
-	fixture.density = 50.f;
-	fixture.friction = 1.f;
-	fixture.restitution = 0.5f; // Force of bouncing item off the other hitboxes
-    fixture.filter.categoryBits = COLLISION_WEAPON;
-    fixture.filter.maskBits = COLLISION_WORLD | COLLISION_PLR_OUTER_HITBOX;
+
+	b2FixtureDef fixture = PhysicsWorld::CreateFixture(&shape, 50.f, 1.f, 0.5f, false,
+		COLLISION_WEAPON, COLLISION_WORLD | COLLISION_PLR_OUTER_HITBOX,
+		new PhysicsData(PhysicsBodyType::Weapon, weapon));
+
+	b2Body* body = PhysicsWorld::CreateBody(b2_dynamicBody,
+		b2Vec2(weapon->GetPosition().x, weapon->GetPosition().y), 0, 5.f, 5.f, fixture);
 
 
-	b2FixtureUserData userData;
-	PhysicsData* metadata = new PhysicsData();
-	metadata->name = "Weapon";
-	metadata->owner = weapon;
-	userData.pointer = reinterpret_cast<uintptr_t>(metadata);
-
-	fixture.userData = userData;
-
-	body->CreateFixture(&fixture);
-	
 	weapon->SetPhysicsBody(body);
 }
 
 static void initWeapon(RangeWeapon* weapon) {
-	b2BodyDef bodyDef;
-	bodyDef.linearDamping = 5.f;
-	bodyDef.angularDamping = 5.f;
-	bodyDef.type = b2_dynamicBody;
-	bodyDef.position.Set(
-		weapon->GetPosition().x,
-		weapon->GetPosition().y);
-	b2Body* body = PhysicsWorld::GetWorld().CreateBody(&bodyDef);
 
 	b2PolygonShape shape;
 	shape.SetAsBox(weapon->m_physics_body_size.x, weapon->m_physics_body_size.y);
 
+	b2FixtureDef fixture = PhysicsWorld::CreateFixture(&shape, 50.f, 1.f, 0.5f, 
+		false, COLLISION_WEAPON, COLLISION_WORLD | COLLISION_PLR_OUTER_HITBOX, 
+		new PhysicsData(PhysicsBodyType::Weapon, weapon));
 
-	b2FixtureDef fixture;
-	fixture.shape = &shape;
-	fixture.density = 50.f;
-	fixture.friction = 1.f;
-	fixture.restitution = 0.5f; // Force of bouncing item off the other hitboxes
-	fixture.filter.categoryBits = COLLISION_WEAPON;
-	fixture.filter.maskBits = COLLISION_WORLD | COLLISION_PLR_OUTER_HITBOX;
+	b2Body* body = PhysicsWorld::CreateBody(b2_dynamicBody, 
+		b2Vec2(weapon->GetPosition().x, weapon->GetPosition().y), 0, 5.f, 5.f, fixture);
 
-
-	b2FixtureUserData userData;
-	PhysicsData* metadata = new PhysicsData();
-	metadata->name = "Weapon";
-	metadata->owner = weapon;
-	userData.pointer = reinterpret_cast<uintptr_t>(metadata);
-
-	fixture.userData = userData;
-
-	body->CreateFixture(&fixture);
 
 	weapon->SetPhysicsBody(body);
 }

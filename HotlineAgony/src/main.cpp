@@ -66,8 +66,6 @@ int main(int argc, char** argv)
 
 
     std::string font_path = game_path + "assets/fonts/Courier Prime.ttf";
-    b2BodyDef bodyPlayerDef;
-    bodyPlayerDef.type = b2_dynamicBody;
 
     Player plr(default_camera);
 
@@ -105,6 +103,7 @@ int main(int argc, char** argv)
 
     while (!WindowShouldClose())
     {
+
         PhysicsWorld::GetWorld().Step(GetFrameTime() * TIME_SCALE, 6 * TIME_SCALE, 2 * TIME_SCALE);
         
 

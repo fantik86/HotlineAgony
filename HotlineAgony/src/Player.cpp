@@ -116,7 +116,7 @@ void Player::updateKeyPress() {
                 dropTime = GetTime() + 1.0;
             }
             if (GetTime() > dropTime) {
-                if (holdingWeapon->m_weapon_name != "wp_Fists") {
+                if (holdingWeapon->m_weapon_type != WeaponType::wp_Fists) {
                     int random_rotate = std::rand() % 2;
                     float random_drop_direction = std::rand() % 360;
                     holdingWeapon->SetOnGround(true);
@@ -135,7 +135,7 @@ void Player::updateKeyPress() {
             }
         }
         if (IsMouseButtonReleased(std::get<MouseButton>(controls.item_throw))) {
-            if (holdingWeapon->m_weapon_name != "wp_Fists") {
+            if (holdingWeapon->m_weapon_type != WeaponType::wp_Fists) {
                 if (!justPickedUpWeapon) {
                     justPickedUpWeapon = true;
                     return;
@@ -168,12 +168,24 @@ void Player::updateKeyPress() {
         }
 
         if (IsMouseButtonPressed(std::get<MouseButton>(controls.item_throw))) {
-            if (holdingWeapon->m_weapon_name == "wp_Fists") { ///< Weapon take
+            if (holdingWeapon->m_weapon_type == WeaponType::wp_Fists) { ///< Weapon take
                 if (m_collidingWeapons.size() > 0) {
                     holdingWeapon = m_collidingWeapons.at(0);
                     holdingWeapon->SetOnGround(false);
                     justPickedUpWeapon = false;
                 }
+            }
+        }
+
+        if (IsMouseButtonPressed(std::get<MouseButton>(controls.attack))) {
+            switch (holdingWeapon->m_weapon_type) {
+            case WeaponType::wp_Fists:
+                break;
+            case WeaponType::wp_Knife:
+                break;
+            case WeaponType::wp_Pistol:
+                PhysicsWorld::CreateBullet(Vector2Zero(), degree_direction * DEG2RAD, 10000);
+                break;
             }
         }
 
@@ -230,12 +242,31 @@ void Player::updateState() {
     bool isDownPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_down));
     bool isAttackPressed = IsMouseButtonDown(std::get<MouseButton>(controls.attack));
 
+    int anim_idle_id = 0;
+    int anim_walk_id = 1;
+    int anim_legs_id = 2;
+    int anim_attack_id = 3;
+
+    switch (holdingWeapon->m_weapon_type) {
+    case WeaponType::wp_Fists:
+        anim_attack_id = 3;
+        break;
+    case WeaponType::wp_Knife:
+        anim_idle_id = 5;
+        anim_attack_id = 4;
+        break;
+    case WeaponType::wp_Pistol:
+        anim_idle_id = 6;
+        anim_walk_id = 6;
+        anim_attack_id = 6;
+        break;
+    }
+
     if (isAttackPressed) {
         setState(CharacterState::Attacking);
-        Animator::Play(3);
-        Animator::Stop(0);
+        Animator::Play(anim_attack_id);
+        Animator::Stop(anim_idle_id);
         Animator::Stop(1);
-
     }
 
     if (Animator::GetAnimationById(3).getAnimationState() == AnimationState::Ended) {
@@ -248,31 +279,31 @@ void Player::updateState() {
             if (isLeftPressed && !isRightPressed ||
                 isRightPressed && !isLeftPressed) {
                 setState(CharacterState::Walking);
-                Animator::Play(1);
-                Animator::Play(2);
+                Animator::Play(anim_walk_id);
+                Animator::Play(anim_legs_id);
                 return;
             }
             
             if (isUpPressed && !isDownPressed ||
                 isDownPressed && !isUpPressed) {
                 setState(CharacterState::Walking);
-                Animator::Play(1);
-                Animator::Play(2);
+                Animator::Play(anim_walk_id);
+                Animator::Play(anim_legs_id);
                 return;
             }
 
             if (isLeftPressed && isRightPressed ||
                 isUpPressed && isDownPressed) {
                 setState(CharacterState::Idle);
-                Animator::Stop(2);
-                Animator::Play(0);
+                Animator::Stop(anim_legs_id);
+                Animator::Play(anim_idle_id);
                 return;
             }
         }
         else {
             setState(CharacterState::Idle);
-            Animator::Stop(2);
-            Animator::Play(0);
+            Animator::Stop(anim_legs_id);
+            Animator::Play(anim_idle_id);
             return;
         }
     }

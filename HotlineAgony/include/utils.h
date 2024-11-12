@@ -20,6 +20,7 @@ enum class TileType {
 };
 
 
+
 enum class TileRotation { // TODO: make this enum float
     LEFT = 0,
     UP = 90,
@@ -115,6 +116,13 @@ enum class AnimationState {
     Playing,         ///< Animation is playing right now or resumed.
     Ended,           ///< Animation isn't looped and played till the last frame.
     Pause            ///< Animation staying in the same frame and doesn't playing.
+};
+
+enum class WeaponType {
+    wp_Fists,
+    wp_Knife,
+    wp_Pistol,
+    wp_Unknown
 };
 
 /**

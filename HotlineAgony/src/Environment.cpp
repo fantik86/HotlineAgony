@@ -92,23 +92,23 @@ void Environment::InitTilemapHitboxes() {
 					float tile_pos_x = (tile_size_x * column) - (ENV_TILES_COUNT * tile_size_x) / 2.0f + position.x;
 					float tile_pos_y = (tile_size_y * row) - (ENV_TILES_COUNT * tile_size_y) / 2.0f + position.y;
 
-					b2BodyDef bodyWallDef;
-					bodyWallDef.type = b2_staticBody;
-					b2Body* wallbody = PhysicsWorld::GetWorld().CreateBody(&bodyWallDef);
+					b2Body* wallbody;
 
 					float tile_rotation_rad = DEG2RAD * static_cast<float>(tile.rotation);
-					wallbody->SetTransform(b2Vec2(tile_pos_x - 12 * cos(tile_rotation_rad), tile_pos_y - 12 * sin(tile_rotation_rad)), tile_rotation_rad);
-
+					
 					b2PolygonShape wallshape;
 					wallshape.SetAsBox(8 * tilemap_size_multiplier, 32 * tilemap_size_multiplier);
 
-					b2FixtureDef wallfixture;
-					wallfixture.shape = &wallshape;
-					wallfixture.density = 1.0f;
-					wallfixture.friction = 0.3f;
-                    wallfixture.filter.categoryBits = COLLISION_WORLD;
 
-					wallbody->CreateFixture(&wallfixture);
+
+					b2FixtureDef fixture = PhysicsWorld::CreateFixture(&wallshape, 1.f, 0.3f, 0, false,
+						COLLISION_WORLD, COLLISION_WORLD | COLLISION_PLR_HITBOX | COLLISION_WEAPON, 
+						new PhysicsData(PhysicsBodyType::Wall, NULL));
+
+					wallbody = PhysicsWorld::CreateBody(b2_staticBody,
+						b2Vec2(tile_pos_x - 12 * cos(tile_rotation_rad), 
+							tile_pos_y - 12 * sin(tile_rotation_rad)), 
+						tile_rotation_rad, 0, 0, fixture);
 				}
 			}
 		}

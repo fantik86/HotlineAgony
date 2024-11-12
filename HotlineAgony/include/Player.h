@@ -40,55 +40,27 @@ namespace game {
                 Animator::Add(6, anim_pistol_idle);
                 Animator::Play(0);
                 Animator::Play(2);
-                b2BodyDef bodyPlayerDef;
-                bodyPlayerDef.type = b2_dynamicBody;
-                physics_body = PhysicsWorld::GetWorld().CreateBody(&bodyPlayerDef);
 
                 b2CircleShape player_shape;
                 player_shape.m_radius = 8.f;
                 
-                b2FixtureDef plrFixture;
-                plrFixture.shape = &player_shape;
-                plrFixture.density = 1.f;
-                plrFixture.friction = 0.5f;
-                plrFixture.filter.categoryBits = COLLISION_PLR_HITBOX;
-                plrFixture.filter.maskBits = COLLISION_WORLD;
+                b2FixtureDef plrFixture = PhysicsWorld::CreateFixture(&player_shape, 1.f, 0.5f, 0, 
+                    false, COLLISION_PLR_HITBOX, COLLISION_WORLD, 
+                    new PhysicsData(PhysicsBodyType::Player, this));
 
-                b2FixtureUserData userData;
-                PhysicsData* metadata = new PhysicsData();
-                metadata->name = "Player";
-                metadata->owner = this;
-                userData.pointer = reinterpret_cast<uintptr_t>(metadata);
+                physics_body = PhysicsWorld::CreateBody(b2_dynamicBody, b2Vec2_zero, 0, 0, 0, plrFixture);
 
-                plrFixture.userData = userData;
-
-                physics_body->CreateFixture(&plrFixture);
-
-                b2BodyDef bodyCollisionDef;
-                bodyCollisionDef.type = b2_dynamicBody;
 
                 b2CircleShape collision_shape;
                 collision_shape.m_radius = 26.f;
 
-                b2FixtureDef collisionFixture;
-                collisionFixture.shape = &collision_shape;
-                collisionFixture.density = 1.f;
-                collisionFixture.friction = 0.f;
-                collisionFixture.isSensor = true;
-                collisionFixture.filter.categoryBits = COLLISION_PLR_OUTER_HITBOX;
-                collisionFixture.filter.maskBits = COLLISION_WEAPON;
+                b2FixtureDef collisionFixture = PhysicsWorld::CreateFixture(&collision_shape, 1.f, 0.f, 0, 
+                    true, COLLISION_PLR_OUTER_HITBOX, COLLISION_WEAPON,
+                    new PhysicsData(PhysicsBodyType::CollisionBox, this));
 
-                b2FixtureUserData collisionUserData;
-                PhysicsData* collisionMetadata = new PhysicsData();
-                collisionMetadata->name = "playerCollision";
-                collisionMetadata->owner = this;
-                collisionUserData.pointer = reinterpret_cast<uintptr_t>(collisionMetadata);
-
-                collisionFixture.userData = collisionUserData;
-
-                collision_body = PhysicsWorld::GetWorld().CreateBody(&bodyCollisionDef);
-                collision_body->CreateFixture(&collisionFixture);
+                collision_body = PhysicsWorld::CreateBody(b2_dynamicBody, b2Vec2_zero, 0, 0, 0, collisionFixture);
                 collision_body->SetSleepingAllowed(false);
+
             }
 
             void Draw() override;

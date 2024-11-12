@@ -15,17 +15,25 @@ class ContactListener : public b2ContactListener {
 			return;
 		}
 
-		std::string nameA = reinterpret_cast<PhysicsData*>(a->GetUserData().pointer)->name;
-        std::string nameB = reinterpret_cast<PhysicsData*>(b->GetUserData().pointer)->name;
-
 		PhysicsData* dataA = reinterpret_cast<PhysicsData*>(a->GetUserData().pointer);
 		PhysicsData* dataB = reinterpret_cast<PhysicsData*>(b->GetUserData().pointer);
 
-		if (nameA == "playerCollision" && nameB == "Weapon") {
+		PhysicsBodyType typeA = dataA->body_type;
+		PhysicsBodyType typeB = dataB->body_type;
+
+
+		if (typeA == PhysicsBodyType::CollisionBox && typeB == PhysicsBodyType::Weapon) {
 			reinterpret_cast<Character*>(dataA->owner)->m_collidingWeapons.push_back(reinterpret_cast<MeleeWeapon*>(dataB->owner));
 		}
-		else if (nameA == "Weapon" && nameB == "playerCollision") {
-    			reinterpret_cast<Character*>(dataB->owner)->m_collidingWeapons.push_back(reinterpret_cast<MeleeWeapon*>(dataA->owner));
+		else if (typeA == PhysicsBodyType::Weapon && typeB == PhysicsBodyType::CollisionBox) {
+    		reinterpret_cast<Character*>(dataB->owner)->m_collidingWeapons.push_back(reinterpret_cast<MeleeWeapon*>(dataA->owner));
+		}
+
+		if (typeA == PhysicsBodyType::Bullet && typeB == PhysicsBodyType::Wall) {
+			dataA->isFlaggedToDelete = true;
+		}
+		else if (typeA == PhysicsBodyType::Wall && typeB == PhysicsBodyType::Bullet) {
+			dataB->isFlaggedToDelete = true;
 		}
 	}
 
@@ -40,14 +48,14 @@ class ContactListener : public b2ContactListener {
 		PhysicsData* dataA = reinterpret_cast<PhysicsData*>(a->GetUserData().pointer);
 		PhysicsData* dataB = reinterpret_cast<PhysicsData*>(b->GetUserData().pointer);
 
-        std::string nameA = dataA->name;
-        std::string nameB = dataB->name;
+		PhysicsBodyType typeA = dataA->body_type;
+		PhysicsBodyType typeB = dataB->body_type;
 
 		b2Vec2 posA = a->GetBody()->GetPosition();
 		b2Vec2 posB = b->GetBody()->GetPosition();
 		float degrees = atan2(posA.y - posB.y, posA.x - posB.x) * RAD2DEG;
 		b2Vec2 Velocity = b2Vec2(cos(degrees), sin(degrees));
-		if (nameA == "playerCollision" && nameB == "Weapon") {
+		if (typeA == PhysicsBodyType::CollisionBox && typeB == PhysicsBodyType::Weapon) {
 			Character* character = reinterpret_cast<Character*>(dataA->owner);
 			MeleeWeapon* weapon = reinterpret_cast<MeleeWeapon*>(dataB->owner);
 			Velocity *= 15;
@@ -55,7 +63,7 @@ class ContactListener : public b2ContactListener {
             auto it = std::find(character->m_collidingWeapons.begin(), character->m_collidingWeapons.end(), weapon);
             character->m_collidingWeapons.erase(it);
 		}
-		else if (nameA == "Weapon" && nameB == "playerCollision") {
+		else if (typeA == PhysicsBodyType::Weapon && typeB == PhysicsBodyType::CollisionBox) {
 			Character* character = reinterpret_cast<Character*>(dataB->owner);
 			MeleeWeapon* weapon = reinterpret_cast<MeleeWeapon*>(dataA->owner);
 			Velocity *= 15;
@@ -64,10 +72,10 @@ class ContactListener : public b2ContactListener {
             auto it = std::find(character->m_collidingWeapons.begin(), character->m_collidingWeapons.end(), weapon);
             character->m_collidingWeapons.erase(it);
 		}
-        if (nameA == "Player" && nameB == "Weapon") {
+        if (typeA == PhysicsBodyType::Player && typeB == PhysicsBodyType::Weapon) {
             b->GetBody()->SetAngularVelocity(rand() % 2 == 0 ? rand() % 2 + 2 : -(rand() % 2 + 2));
         }
-        else if (nameA == "Weapon" && nameB == "Player") {
+        else if (typeA == PhysicsBodyType::Weapon && typeB == PhysicsBodyType::Player) {
             a->GetBody()->SetAngularVelocity(rand() % 2 == 0 ? rand() % 2 + 2 : -(rand() % 2 + 2));
         }
 	}
