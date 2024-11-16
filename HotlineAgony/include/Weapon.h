@@ -42,7 +42,10 @@ public:
 	inline void SetPosition(Vector2 position) {
 		m_position = position;
 	}
-	inline void SetPhysicsBodyPosition(b2Vec2 position) {
+	inline void SetPhysicsBodyTransform(b2Vec2 position, float angle) {
+		m_physics_body->SetTransform(position, angle);
+	}
+	inline void SetPhysicsBodyTransform(b2Vec2 position) {
 		m_physics_body->SetTransform(position, m_physics_body->GetAngle());
 	}
 	inline Texture2D& GetLyingSprite() {

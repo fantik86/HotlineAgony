@@ -78,7 +78,7 @@ void WeaponHandler::DrawWeapons() {
 					sprite_height / 2 }, angle * RAD2DEG, WHITE);
 		}
 		else {
-			weapon->SetPhysicsBodyPosition(b2Vec2{ FLT_MAX, FLT_MAX });
+			weapon->SetPhysicsBodyTransform(b2Vec2{ FLT_MAX, FLT_MAX });
 		}
 	}
 	for (auto& weapon : m_RangeWeapons) {
