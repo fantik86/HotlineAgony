@@ -5,13 +5,13 @@
 * @brief Game options.
 */
 
-#define GAME_VERSION "0.6a"
+#define GAME_VERSION "0.8.0-alpha"
 
 #define SHOW_HITBOX 0
 
 #define FULLSCREEN_ON_START false
 
-#define WINDOW_NAME "HOTLINE AGONY | version " GAME_VERSION
+#define WINDOW_NAME "HOTLINE AGONY | " GAME_VERSION
 #define DEFAULT_WINDOW_WIDTH 800.0f
 #define DEFAULT_WINDOW_HEIGHT 600.0f
 #define CAMERA_ZOOM_MULTIPLIER 1.5f
