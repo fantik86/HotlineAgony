@@ -9,11 +9,23 @@
 #include "WeaponHandler.h"
 #include "b2DrawRayLib.hpp"
 
-void testfunc(int logLevel, const char* text, va_list args) {
-    printf("GAMELOG: ");
-    vprintf(text, args);
-    printf("\n");
+
+void customlogger(int logLevel, const char* text, va_list args) {
+        time_t timestamp = time(&timestamp);
+        struct tm datetime = *localtime(&timestamp);
+        switch (logLevel) {
+        case LOG_INFO: printf("[INFO]: "); break;
+        case LOG_ERROR: printf("[ERROR]: "); break;
+        case LOG_WARNING: printf("[WARN]: "); break;
+        case LOG_DEBUG: printf("[DEBUG]: "); break;
+        case 8: printf("GAMELOG: "); break;
+        case 9: printf("[%d:%d:%d]: ", datetime.tm_hour, datetime.tm_min, datetime.tm_sec); break;
+        }
+        vprintf(text, args);
+        printf("\n");
 }
+
+
 using game::drawing::Tilemap;
 using game::global::Environment;
 using game::global::TexturePool;
@@ -29,8 +41,9 @@ int main(int argc, char** argv)
     InitWindow((int)DEFAULT_WINDOW_WIDTH, (int)DEFAULT_WINDOW_HEIGHT, WINDOW_NAME);
     
     SetWindowState(FLAG_VSYNC_HINT);
-
+    SetExitKey(NULL);
     SetTargetFPS(60);
+    SetTraceLogCallback(customlogger);
 
     std::string game_path = GetApplicationDirectory();
 
@@ -87,7 +100,7 @@ int main(int argc, char** argv)
     );
     
     PhysicsWorld::GetWorld().SetDebugDraw(&drawer);
-
+    
     float defaultCameraZoom = getWindowSizeRatio();
 
     if (IsWindowFullscreen()) // Can ruin any attempts to change zoom in other place
@@ -100,7 +113,7 @@ int main(int argc, char** argv)
     //-------------------------------------------------//
     //                    MAIN LOOP                    //
     //-------------------------------------------------//
-
+    
     while (!WindowShouldClose())
     {
 
@@ -109,20 +122,23 @@ int main(int argc, char** argv)
 
         BeginDrawing();
 
-        ClearBackground(RAYWHITE);
         
+        ClearBackground(RAYWHITE);
+
         
         worldcam.offset = plr.player_camera.offset;
         worldcam.target = plr.player_camera.target; // May be buggy
         worldcam.zoom = plr.player_camera.zoom;
-        
+
+
 
         BeginMode2D(worldcam);
-        
-        Environment::DrawTilemap(plr.player_camera, plr.position);
 
+        Environment::DrawTilemap(plr.player_camera, plr.position);
         WeaponHandler::DrawWeapons();
+
         EndMode2D();
+
 
         Animator::Update();
         plr.updatePlayer(); // Player is updating at the end of tick to draw him over tilemap
