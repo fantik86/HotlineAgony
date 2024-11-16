@@ -44,6 +44,22 @@ private:
 	Color m_tint;
 };
 
+class GuiRectangle : public GuiElement {
+public:
+	GuiRectangle(Rectangle rec, Vector2 origin, float rotation,
+		Color color) :
+		m_rectangle(rec), m_origin(origin), m_rotation(rotation), m_color(color) {};
+
+	void Draw() override {
+		DrawRectanglePro(m_rectangle, m_origin, m_rotation, m_color);
+	}
+private:
+	Rectangle m_rectangle;
+	Vector2 m_origin;
+	float m_rotation;
+	Color m_color;
+};
+
 
 namespace game {
 	namespace drawing {
@@ -53,6 +69,8 @@ namespace game {
 				float fontSize, float spacing, Color tint);
 			static void addTexture(Texture2D texture, Rectangle source,
 				Rectangle dest, Vector2 origin, float rotation, Color tint);
+			static void addRectangle(Rectangle rec, Vector2 origin, float rotation,
+				Color color);
 			static void drawGui();
 		private:
 			static std::vector<std::unique_ptr<GuiElement>> m_guiElements;

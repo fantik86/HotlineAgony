@@ -1,4 +1,5 @@
 #include "GUI.h"
+#include "Chat.h"
 
 using game::drawing::GUI;
 
@@ -15,8 +16,14 @@ void GUI::addTexture(Texture2D texture, Rectangle source,
 	GUI::m_guiElements.push_back(std::make_unique<GuiTexture>(texture, source, dest, origin, rotation, tint));
 }
 
+void GUI::addRectangle(Rectangle rec, Vector2 origin, float rotation,
+	Color color) {
+	GUI::m_guiElements.push_back(std::make_unique<GuiRectangle>(rec, origin, rotation, color));
+}
+
 void GUI::drawGui() {
 	for (const auto& element : GUI::m_guiElements) {
 		element.get()->Draw();
 	}
+	
 }
