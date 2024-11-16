@@ -64,10 +64,11 @@ namespace game {
             }
 
             void Draw() override;
-            void updateKeyPress(); // TODO: move "Move()" to Character class and make it virtual
+            void updateKeyPress();
             void updateState();
             void updatePlayer();
             void updateCamera();
+            void updateWalkingDirection();
             void setCamera(Camera2D& camera);
             playercontrols_t controls;
             Camera2D& player_camera;

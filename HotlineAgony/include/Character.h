@@ -31,15 +31,13 @@ namespace game {
             Vector2 getWalkingDirection() const;
             const Tile& getStandingTile(); ///< Get the tile where character stading on
             Vector2 getStandingTilePos();
+            bool isMoving();
             Vector2 position = Vector2{ 0, 0 };
             Texture2D playerBodyTexture = { 0 };
             Texture2D playerLegsTexture = { 0 };
             b2Body* physics_body = { 0 };
             std::vector<MeleeWeapon*> m_collidingWeapons;
         protected:
-            void setWalkingDirection(Vector2 new_walking_direction);
-            void setWalkingDirectionX(float new_X);
-            void setWalkingDirectionY(float new_Y);
             float degree_direction = 0;
             Vector2 walking_direction = { 0, 0 };
             float character_size = 0.95f;
@@ -50,7 +48,6 @@ namespace game {
             float m_health;                     ///< Character health. Game will define Character as dead, if health <= 0.
             const float m_max_health;           ///< Max health of the character.
             //const int& low_health;            ///< Maybe TBA in future
-            bool moving = false;                ///< Is Character moving right now
             bool isInvincible = false;          ///< Is Character cant be killed
             CharacterState state = CharacterState::Idle; ///< Current character state, animation, death, attack and other things are depends on state.
             CharacterAppearance appearance = CharacterAppearance::russian_mafia; ///< Character \ref Animation set

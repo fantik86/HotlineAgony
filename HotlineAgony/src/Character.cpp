@@ -1,8 +1,8 @@
 #include "Character.h"
 #include "raylib.h"
+#include "raymath.h"
 #include "options.h"
 #include "Animation.h"
-
 
 using game::living::Character;
 
@@ -37,16 +37,9 @@ Vector2 Character::getWalkingDirection() const {
 	return walking_direction;
 }
 
-void Character::setWalkingDirection(Vector2 new_walking_direction) {
-	walking_direction = new_walking_direction;
-}
 
-void Character::setWalkingDirectionX(float new_X) {
-	walking_direction.x = new_X;
-}
-
-void Character::setWalkingDirectionY(float new_Y) {
-	walking_direction.y = new_Y;
+bool Character::isMoving() {
+	return walking_direction != Vector2Zero();
 }
 
 void Character::Draw() {
