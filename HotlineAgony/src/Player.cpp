@@ -1,8 +1,9 @@
 #include "Player.h"
-
+#include "Chat.h"
 
 using game::living::Player;
 using game::global::Environment;
+using game::drawing::Chat;
 
 extern Camera2D worldcam;
 
@@ -100,10 +101,12 @@ void Player::updateKeyPress() {
         Environment::switchShowHitboxes();
     }
 
+    Chat::Update(*this);
 
-    
+
+
     // Player movement
-    if (canControl) {
+    if (canControl && !Chat::isEnabled()) {
         bool isLeftPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_left));
         bool isRightPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_right));
         bool isUpPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_up));
@@ -116,11 +119,11 @@ void Player::updateKeyPress() {
                 dropTime = GetTime() + 1.0;
             }
             if (GetTime() > dropTime) {
-                if (holdingWeapon->m_weapon_type != WeaponType::wp_Fists) {
+                if (holdingWeapon->m_weapon_type != WeaponType::wp_Fists) { // Weapon drop
                     int random_rotate = std::rand() % 2;
                     float random_drop_direction = std::rand() % 360;
                     holdingWeapon->SetOnGround(true);
-                    holdingWeapon->SetPhysicsBodyPosition(b2Vec2(position.x, position.y));
+                    holdingWeapon->SetPhysicsBodyTransform(b2Vec2(position.x, position.y));
                     holdingWeapon->GetPhysicsBody()->SetAngularVelocity(random_rotate == 1 ? 2 : -2);
 
                     float dropLength = 40.f;
@@ -143,7 +146,8 @@ void Player::updateKeyPress() {
                 int random_rotate = std::rand() % 2;
                 float random_drop_direction = std::rand() % 360;
                 holdingWeapon->SetOnGround(true);
-                holdingWeapon->SetPhysicsBodyPosition(b2Vec2(position.x, position.y));
+                holdingWeapon->SetPhysicsBodyTransform(b2Vec2(position.x, position.y));
+                holdingWeapon->GetPhysicsBody()->SetTransform(b2Vec2(position.x, position.y), degree_direction * DEG2RAD);
                 holdingWeapon->GetPhysicsBody()->SetAngularVelocity(random_rotate == 1 ? 2 : -2);
 
                 float dropLength = 1600.f * Clamp(abs(1 - (dropTime - GetTime())), 0.1f, 1.f);
@@ -159,7 +163,6 @@ void Player::updateKeyPress() {
                     sin(character_direction) * dropLength);
 
                 holdingWeapon->GetPhysicsBody()->SetLinearVelocity(dropVelocity);
-                holdingWeapon->GetPhysicsBody()->ApplyAngularImpulse(100000, true);
                 holdingWeapon = new wp_Fists();
             }
         }
@@ -189,50 +192,46 @@ void Player::updateKeyPress() {
             }
         }
 
-        int rotationLerpTarget = 0;
+        updateWalkingDirection();
 
-        if (isUpPressed) {
-            setWalkingDirectionY(1.f);
-            velocity.y -= walkspeed;
-        }
-        if (isDownPressed) {
-            setWalkingDirectionY(-1.f);
-            velocity.y += walkspeed;
-        }
-        if (isRightPressed) {
-            setWalkingDirectionX(1.f);
-            rotationLerpTarget -= 1;
-            velocity.x += walkspeed;
-        }
-        if (isLeftPressed) {
-            setWalkingDirectionX(-1.f);
-            rotationLerpTarget += 1;
-            velocity.x -= walkspeed;
-        }
-
-        if (isRightPressed && isLeftPressed)
-            setWalkingDirectionX(0.f);
-        if (isUpPressed && isDownPressed)
-            setWalkingDirectionY(0.f);
-
-        if (!isRightPressed && !isLeftPressed)
-            setWalkingDirectionX(0.f);
-        if (!isUpPressed && !isDownPressed)
-            setWalkingDirectionY(0.f);
-
-
-        if (walking_direction != Vector2Zero()) {
-            moving = true;
-        }
-        else {
-            moving = false;
-        }
-
-        worldcam.rotation = Lerp(worldcam.rotation, rotationLerpTarget, 0.05f);
+        velocity.x = walking_direction.x * walkspeed;
+        velocity.y = -walking_direction.y * walkspeed;
+        
+        worldcam.rotation = Lerp(worldcam.rotation, -walking_direction.x, 0.05f);
 
         physics_body->SetLinearVelocity(velocity);
         collision_body->SetTransform(physics_body->GetPosition(), 0.f);
     }
+}
+
+void Player::updateWalkingDirection() {
+    bool isLeftPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_left));
+    bool isRightPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_right));
+    bool isUpPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_up));
+    bool isDownPressed = IsKeyDown(std::get<KeyboardKey>(controls.move_down));
+
+    if (isUpPressed) {
+        walking_direction.y = 1;
+    }
+    if (isDownPressed) {
+        walking_direction.y = -1;
+    }
+    if (isRightPressed) {
+        walking_direction.x = 1;
+    }
+    if (isLeftPressed) {
+        walking_direction.x = -1;
+    }
+
+    if (isRightPressed && isLeftPressed)
+        walking_direction.x = 0;
+    if (isUpPressed && isDownPressed)
+        walking_direction.y = 0;
+
+    if (!isRightPressed && !isLeftPressed)
+        walking_direction.x = 0;
+    if (!isUpPressed && !isDownPressed)
+        walking_direction.y = 0;
 }
 
 void Player::updateState() {
@@ -278,18 +277,22 @@ void Player::updateState() {
             isUpPressed || isDownPressed) {
             if (isLeftPressed && !isRightPressed ||
                 isRightPressed && !isLeftPressed) {
-                setState(CharacterState::Walking);
-                Animator::Play(anim_walk_id);
-                Animator::Play(anim_legs_id);
-                return;
+                if (isMoving()) {
+                    setState(CharacterState::Walking);
+                    Animator::Play(anim_walk_id);
+                    Animator::Play(anim_legs_id);
+                    return;
+                }
             }
             
             if (isUpPressed && !isDownPressed ||
                 isDownPressed && !isUpPressed) {
-                setState(CharacterState::Walking);
-                Animator::Play(anim_walk_id);
-                Animator::Play(anim_legs_id);
-                return;
+                if (isMoving()) {
+                    setState(CharacterState::Walking);
+                    Animator::Play(anim_walk_id);
+                    Animator::Play(anim_legs_id);
+                    return;
+                }
             }
 
             if (isLeftPressed && isRightPressed ||
