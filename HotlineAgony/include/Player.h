@@ -6,6 +6,7 @@
 #include "Environment.h"
 #include "Animation.h"
 #include "Animator.h"
+#include "FixtureDefBuilder.h"
 
 using game::living::Character;
 using game::drawing::Animation;
@@ -44,21 +45,31 @@ namespace game {
                 b2CircleShape player_shape;
                 player_shape.m_radius = 8.f;
                 
-                b2FixtureDef plrFixture = PhysicsWorld::CreateFixture(&player_shape, 1.f, 0.5f, 0, 
-                    false, COLLISION_PLR_HITBOX, COLLISION_WORLD, 
-                    new PhysicsData(PhysicsBodyType::Player, this));
+                game::physics::FixtureDefBuilder player_fixture;
+                player_fixture.setShape(&player_shape);
+                player_fixture.setDensity(1.f);
+                player_fixture.setFriction(0.5f);
+                player_fixture.setSensor(false);
+                player_fixture.setCategoryBits(COLLISION_PLR_HITBOX);
+                player_fixture.setMaskBits(COLLISION_WORLD);
+                player_fixture.setPhysicsData(new PhysicsData(PhysicsBodyType::Player, this));
 
-                physics_body = PhysicsWorld::CreateBody(b2_dynamicBody, b2Vec2_zero, 0, 0, 0, plrFixture);
+                physics_body = PhysicsWorld::CreateBody(b2_dynamicBody, b2Vec2_zero, 0, 0, 0, player_fixture.getResult());
 
 
                 b2CircleShape collision_shape;
                 collision_shape.m_radius = 26.f;
 
-                b2FixtureDef collisionFixture = PhysicsWorld::CreateFixture(&collision_shape, 1.f, 0.f, 0, 
-                    true, COLLISION_PLR_OUTER_HITBOX, COLLISION_WEAPON,
-                    new PhysicsData(PhysicsBodyType::CollisionBox, this));
 
-                collision_body = PhysicsWorld::CreateBody(b2_dynamicBody, b2Vec2_zero, 0, 0, 0, collisionFixture);
+                game::physics::FixtureDefBuilder collision_fixture;
+                collision_fixture.setShape(&collision_shape);
+                collision_fixture.setDensity(1.f);
+                collision_fixture.setSensor(true);
+                collision_fixture.setCategoryBits(COLLISION_PLR_OUTER_HITBOX);
+                collision_fixture.setMaskBits(COLLISION_WEAPON);
+                collision_fixture.setPhysicsData(new PhysicsData(PhysicsBodyType::CollisionBox, this));
+
+                collision_body = PhysicsWorld::CreateBody(b2_dynamicBody, b2Vec2_zero, 0, 0, 0, collision_fixture.getResult());
                 collision_body->SetSleepingAllowed(false);
 
             }

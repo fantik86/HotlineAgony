@@ -1,6 +1,6 @@
 #include "WeaponHandler.h"
 #include "PhysicsWorld.h"
-
+#include "FixtureDefBuilder.h"
 
 std::vector<MeleeWeapon*> WeaponHandler::m_Weapons = { };
 std::vector<RangeWeapon*> WeaponHandler::m_RangeWeapons = { };
@@ -10,12 +10,19 @@ static void initWeapon(MeleeWeapon* weapon) {
 	b2PolygonShape shape;
 	shape.SetAsBox(weapon->m_physics_body_size.x, weapon->m_physics_body_size.y);
 
-	b2FixtureDef fixture = PhysicsWorld::CreateFixture(&shape, 50.f, 1.f, 0.5f, false,
-		COLLISION_WEAPON, COLLISION_WORLD | COLLISION_PLR_OUTER_HITBOX,
-		new PhysicsData(PhysicsBodyType::Weapon, weapon));
+	game::physics::FixtureDefBuilder weapon_fixture;
+	weapon_fixture.setShape(&shape);
+	weapon_fixture.setDensity(50.f);
+	weapon_fixture.setFriction(1.f);
+	weapon_fixture.setRestitution(0.5f);
+	weapon_fixture.setSensor(false);
+	weapon_fixture.setCategoryBits(COLLISION_WEAPON);
+	weapon_fixture.setMaskBits(COLLISION_WORLD | COLLISION_PLR_OUTER_HITBOX);
+	weapon_fixture.setPhysicsData(new PhysicsData(PhysicsBodyType::Weapon, weapon));
+
 
 	b2Body* body = PhysicsWorld::CreateBody(b2_dynamicBody,
-		b2Vec2(weapon->GetPosition().x, weapon->GetPosition().y), 0, 5.f, 5.f, fixture);
+		b2Vec2(weapon->GetPosition().x, weapon->GetPosition().y), 0, 5.f, 5.f, weapon_fixture.getResult());
 
 
 	weapon->SetPhysicsBody(body);
@@ -26,12 +33,20 @@ static void initWeapon(RangeWeapon* weapon) {
 	b2PolygonShape shape;
 	shape.SetAsBox(weapon->m_physics_body_size.x, weapon->m_physics_body_size.y);
 
-	b2FixtureDef fixture = PhysicsWorld::CreateFixture(&shape, 50.f, 1.f, 0.5f, 
-		false, COLLISION_WEAPON, COLLISION_WORLD | COLLISION_PLR_OUTER_HITBOX, 
-		new PhysicsData(PhysicsBodyType::Weapon, weapon));
+
+	game::physics::FixtureDefBuilder weapon_fixture;
+	weapon_fixture.setShape(&shape);
+	weapon_fixture.setDensity(50.f);
+	weapon_fixture.setFriction(1.f);
+	weapon_fixture.setRestitution(0.5f);
+	weapon_fixture.setSensor(false);
+	weapon_fixture.setCategoryBits(COLLISION_WEAPON);
+	weapon_fixture.setMaskBits(COLLISION_WORLD | COLLISION_PLR_OUTER_HITBOX);
+	weapon_fixture.setPhysicsData(new PhysicsData(PhysicsBodyType::Weapon, weapon));
+
 
 	b2Body* body = PhysicsWorld::CreateBody(b2_dynamicBody, 
-		b2Vec2(weapon->GetPosition().x, weapon->GetPosition().y), 0, 5.f, 5.f, fixture);
+		b2Vec2(weapon->GetPosition().x, weapon->GetPosition().y), 0, 5.f, 5.f, weapon_fixture.getResult());
 
 
 	weapon->SetPhysicsBody(body);

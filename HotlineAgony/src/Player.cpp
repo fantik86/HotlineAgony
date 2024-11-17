@@ -3,7 +3,7 @@
 
 using game::living::Player;
 using game::global::Environment;
-using game::drawing::Chat;
+using game::drawing::Gui::Chat;
 
 extern Camera2D worldcam;
 
@@ -23,9 +23,9 @@ void Player::Draw() {
     
     BeginMode2D(player_camera);
 
-    Environment::DrawTexture(playerLegsTexture, position, Vector2{ legs_width / 2.f, legs_height / 2.f }, legs_width, legs_height, character_size, legs_direction);
+    Environment::DrawTexture(playerLegsTexture, position, Vector2{ legs_width / 2.f, legs_height / 2.f }, legs_width, legs_height, legs_direction, character_size);
 
-    Environment::DrawTexture(playerBodyTexture, position, Vector2{ body_width / 2.f, body_height / 2.f }, body_width, body_height, Normalize(body_width, 1 / body_width, body_width), degree_direction);
+    Environment::DrawTexture(playerBodyTexture, position, Vector2{ body_width / 2.f, body_height / 2.f }, body_width, body_height, degree_direction, Normalize(body_width, 1 / body_width, body_width));
 
     EndMode2D();
 }
@@ -187,7 +187,7 @@ void Player::updateKeyPress() {
             case WeaponType::wp_Knife:
                 break;
             case WeaponType::wp_Pistol:
-                PhysicsWorld::CreateBullet(Vector2Zero(), degree_direction * DEG2RAD, 10000);
+                PhysicsWorld::CreateBullet(Vector2Add(position, Vector2{cos(degree_direction * DEG2RAD) * 16, sin(degree_direction * DEG2RAD) * 16}), degree_direction * DEG2RAD, 30000);
                 break;
             }
         }
@@ -200,7 +200,7 @@ void Player::updateKeyPress() {
         worldcam.rotation = Lerp(worldcam.rotation, -walking_direction.x, 0.05f);
 
         physics_body->SetLinearVelocity(velocity);
-        collision_body->SetTransform(physics_body->GetPosition(), 0.f);
+        collision_body->SetTransform(b2Vec2(position.x, position.y), 0.f);
     }
 }
 
@@ -313,8 +313,7 @@ void Player::updateState() {
 }
 
 void Player::updatePlayer() {
-    position.x = physics_body->GetPosition().x;
-    position.y = physics_body->GetPosition().y;
+    position = Vector2{ physics_body->GetPosition().x, physics_body->GetPosition().y };
     updateState();
     updateCamera();
     updateKeyPress();
