@@ -1,6 +1,8 @@
+#pragma once
 #include <box2d/box2d.h>
 #include "Character.h"
 #include <algorithm>
+#include "PhysicsDefs.h"
 
 using game::living::Character;
 
