@@ -5,7 +5,7 @@
 #include "PhysicsWorld.h"
 #include "TexturePool.h"
 #include "box2d/box2d.h"
-#include "GUI.h"
+#include "GuiHandler.h"
 #include "WeaponHandler.h"
 #include "b2DrawRayLib.hpp"
 
@@ -30,7 +30,7 @@ using game::drawing::Tilemap;
 using game::global::Environment;
 using game::global::TexturePool;
 using game::living::Player;
-using game::drawing::GUI;
+using game::drawing::Gui::GuiHandler;
 
 Camera2D worldcam;
 
@@ -114,35 +114,48 @@ int main(int argc, char** argv)
     //                    MAIN LOOP                    //
     //-------------------------------------------------//
     
+
     while (!WindowShouldClose())
     {
+        if (!PhysicsWorld::GetWorld().IsLocked()) {
+            b2Body* bodyList = PhysicsWorld::GetWorld().GetBodyList();
 
-        PhysicsWorld::GetWorld().Step(GetFrameTime() * TIME_SCALE, 6 * TIME_SCALE, 2 * TIME_SCALE);
+            while (bodyList->GetNext() != 0) {
+                PhysicsData* data = reinterpret_cast<PhysicsData*>(bodyList->GetFixtureList()->GetUserData().pointer);
+                if (data->isFlaggedToDelete) {
+                    b2Body* body_to_delete = bodyList;
+                    bodyList = bodyList->GetNext();
+                    PhysicsWorld::GetWorld().DestroyBody(body_to_delete);
+                }
+                else {
+                    bodyList = bodyList->GetNext();
+                }
+            }
+        }
+
+        PhysicsWorld::GetWorld().Step(GetFrameTime(), 6, 2);
         
-
         BeginDrawing();
-
         
         ClearBackground(RAYWHITE);
 
-        
         worldcam.offset = plr.player_camera.offset;
         worldcam.target = plr.player_camera.target; // May be buggy
         worldcam.zoom = plr.player_camera.zoom;
 
-
-
         BeginMode2D(worldcam);
 
         Environment::DrawTilemap(plr.player_camera, plr.position);
-        WeaponHandler::DrawWeapons();
+        Environment::DrawWeapons();
+        Environment::DrawBullets();
 
         EndMode2D();
 
 
+
         Animator::Update();
         plr.updatePlayer(); // Player is updating at the end of tick to draw him over tilemap
-        GUI::drawGui();
+        GuiHandler::drawGui();
 
         BeginMode2D(worldcam);
         
