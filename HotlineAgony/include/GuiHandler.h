@@ -61,20 +61,18 @@ private:
 };
 
 
-namespace game {
-	namespace drawing {
-		class GUI {
-		public:
-			static void addText(Font font, const char* text, Vector2 position, 
-				float fontSize, float spacing, Color tint);
-			static void addTexture(Texture2D texture, Rectangle source,
-				Rectangle dest, Vector2 origin, float rotation, Color tint);
-			static void addRectangle(Rectangle rec, Vector2 origin, float rotation,
-				Color color);
-			static void drawGui();
-		private:
-			static std::vector<std::unique_ptr<GuiElement>> m_guiElements;
-			static bool m_guiHidden;
-		};
-	}
+namespace game::drawing::Gui {
+	class GuiHandler {
+	public:
+		static void addText(Font font, const char* text, Vector2 position,
+			float fontSize, float spacing, Color tint);
+		static void addTexture(Texture2D texture, Rectangle source,
+			Rectangle dest, Vector2 origin, float rotation, Color tint);
+		static void addRectangle(Rectangle rec, Vector2 origin, float rotation,
+			Color color);
+		static void drawGui();
+	private:
+		static std::vector<std::unique_ptr<GuiElement>> m_guiElements;
+		static bool m_guiHidden;
+	};
 }

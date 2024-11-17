@@ -1,7 +1,7 @@
 #include <raylib.h>
 #include "Chat.h"
 
-using game::drawing::Chat;
+using game::drawing::Gui::Chat;
 
 std::stringstream Chat::chatInput;
 bool Chat::m_chatEnabled;
