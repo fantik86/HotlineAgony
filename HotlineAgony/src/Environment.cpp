@@ -1,6 +1,8 @@
 #include "Environment.h"
 #include "PhysicsWorld.h"
 #include "CollisionHandler.h"
+#include "PhysicsDefs.h"
+#include "FixtureDefBuilder.h"
 #include "TexturePool.h"
 #include <raymath.h>
 
@@ -99,16 +101,19 @@ void Environment::InitTilemapHitboxes() {
 					b2PolygonShape wallshape;
 					wallshape.SetAsBox(8 * tilemap_size_multiplier, 32 * tilemap_size_multiplier);
 
-
-
-					b2FixtureDef fixture = PhysicsWorld::CreateFixture(&wallshape, 1.f, 0.3f, 0, false,
-						COLLISION_WORLD, COLLISION_WORLD | COLLISION_PLR_HITBOX | COLLISION_WEAPON, 
-						new PhysicsData(PhysicsBodyType::Wall, NULL));
+					game::physics::FixtureDefBuilder wall_fixture;
+					wall_fixture.setShape(&wallshape);
+					wall_fixture.setDensity(1.f);
+					wall_fixture.setFriction(0.3f);
+					wall_fixture.setSensor(false);
+					wall_fixture.setCategoryBits(COLLISION_WORLD);
+					wall_fixture.setMaskBits(COLLISION_WORLD | COLLISION_PLR_HITBOX | COLLISION_WEAPON);
+					wall_fixture.setPhysicsData(new PhysicsData(PhysicsBodyType::Wall, NULL));
 
 					wallbody = PhysicsWorld::CreateBody(b2_staticBody,
 						b2Vec2(tile_pos_x - 12 * cos(tile_rotation_rad), 
 							tile_pos_y - 12 * sin(tile_rotation_rad)), 
-						tile_rotation_rad, 0, 0, fixture);
+						tile_rotation_rad, 0, 0, wall_fixture.getResult());
 				}
 			}
 		}
@@ -135,6 +140,7 @@ void Environment::setTilemapTileTexture(int x, int y, TILEMAP_LAYER layer, TileT
 		tile.rotation = TileRotation::LEFT;
 	}
 }
+
 
 void Environment::FillTilemapLine(int begin_x, int begin_y, int end_x, int end_y, TILEMAP_LAYER layer, TileType texture, TileRotation rotation) {
 	int dx = end_x - begin_x;
@@ -173,7 +179,7 @@ void Environment::FillTilemapSquare(int begin_x, int begin_y, int end_x, int end
 	}
 }
 
-void Environment::DrawTexture(Texture2D texture, Vector2 position, Vector2 origin, float width, float height, float size, float rotation) {
+void Environment::DrawTexture(Texture2D texture, Vector2 position, Vector2 origin, float width, float height, float rotation, float size) {
 	/*
 	DrawTexturePro(texture, Rectangle{ 0, 0, width, height },
 		Rectangle{ position.x, position.y, width * size, height * size },
@@ -194,6 +200,26 @@ void Environment::DrawTexture(Texture2D texture, Vector2 position, Vector2 origi
 
 void Environment::DrawHitboxes() {
 	PhysicsWorld::GetWorld().DebugDraw();
+}
+
+void Environment::DrawBullets() {
+	b2Body* bodyList = PhysicsWorld::GetWorld().GetBodyList();
+
+	while (bodyList->GetNext() != 0) {
+		PhysicsData* data = reinterpret_cast<PhysicsData*>(bodyList->GetFixtureList()->GetUserData().pointer);
+		
+		if (data->body_type == PhysicsBodyType::Bullet && !data->isFlaggedToDelete) {
+			DrawTexturePro(
+				LoadTexture((std::string(GetApplicationDirectory()) + "/assets/effects/bullet.png").c_str()),
+				Rectangle{ 0, 0, 15, 2 }, Rectangle{ bodyList->GetPosition().x, bodyList->GetPosition().y, 15, 2 }, Vector2{ 8, 1 }, bodyList->GetAngle() * RAD2DEG, WHITE);
+		}
+		bodyList = bodyList->GetNext();
+	}
+	
+}
+
+void Environment::DrawWeapons() {
+	WeaponHandler::DrawWeapons();
 }
 
 inline void Environment::GameUpdate() {
