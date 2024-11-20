@@ -8,6 +8,7 @@
 #include "GuiHandler.h"
 #include "WeaponHandler.h"
 #include "b2DrawRayLib.hpp"
+#include "ChatCommands.h"
 
 
 void customlogger(int logLevel, const char* text, va_list args) {
@@ -77,6 +78,7 @@ int main(int argc, char** argv)
     
     Environment::InitTilemapHitboxes();
 
+    ChatCommands::Init();
 
     std::string font_path = game_path + "assets/fonts/Courier Prime.ttf";
 

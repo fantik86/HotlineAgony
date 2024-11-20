@@ -1,5 +1,6 @@
 #include <raylib.h>
 #include "Chat.h"
+#include "ChatCommands.h"
 
 using game::drawing::Gui::Chat;
 
@@ -13,7 +14,7 @@ void Chat::Draw() {
 
 	DrawRectanglePro(Rectangle{ 0,
 		static_cast<float>(GetScreenHeight()),
-		static_cast<float>(GetScreenWidth()), 40 }, Vector2{ 0, 40 },
+		static_cast<float>(GetScreenWidth()), 28 }, Vector2{ 0, 28 },
 		0, Color{ 50, 50, 50, 240 });
 	DrawTextPro(GetFontDefault(), chatInput.str().c_str(), Vector2{ 0, static_cast<float>(GetScreenHeight()) }, Vector2{ 0, 28 }, 0, 28, 1, WHITE);
 }
@@ -25,11 +26,10 @@ void Chat::Update(Player& sender) {
 
     if (IsKeyPressed(KEY_BACKSPACE) || IsKeyPressedRepeat(KEY_BACKSPACE)) {
         if (chatInput.str().length() > 0) {
-
             std::string str = chatInput.str();
             str.pop_back();
-            chatInput.seekp(0, std::ios_base::end);
             chatInput.str(str);
+            chatInput.seekp(0, std::ios_base::end);
         }
     }
 
@@ -70,11 +70,10 @@ void Chat::Disable() {
 	clearChatInput();
 }
 
-
-
 void Chat::Send(Player& sender) {
-	if (chatInput.str() == "/TEST") {
-		TraceLog(8, "Tested :D");
+    std::function<void(Player&)> command = ChatCommands::searchCommand(chatInput.str());
+	if (command != nullptr) {
+        command(sender);
 	}
 	else {
 		TraceLog(9, chatInput.str().c_str());
